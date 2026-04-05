@@ -23,10 +23,12 @@ In the creation screen, use the following settings:
 
 > [!IMPORTANT]
 > Setting the **Root Directory** to `backend` is crucial because this is a monorepo. Render will then look for `requirements.txt` and the `app/` folder inside the `backend/` directory.
+>
+> **CRITICAL**: If your build fails with `Python 3.14` or `pydantic-core metadata` errors, you **MUST** set the `PYTHON_VERSION` environment variable to `3.12.9` (or `3.11.x`) in the Render dashboard.
 
-### 3. Environment Variables
-Add any necessary environment variables in the **Environment** tab:
-- `PYTHON_VERSION`: `3.11.9` (Alternative to `runtime.txt`)
+### 3. Environment Variables (REQUIRED FIX)
+Add the following in the **Environment** tab:
+- `PYTHON_VERSION`: `3.12.9` (This is the **most important** step to fix your build error!)
 - `DATABASE_URL`: (Optional) If you're switching from SQLite to PostgreSQL.
 - `SECRET_KEY`: A secure random string for JWT.
 
