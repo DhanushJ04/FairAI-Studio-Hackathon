@@ -15,10 +15,10 @@ In the creation screen, use the following settings:
 | Field | Value |
 |-------|-------|
 | **Name** | `fair-ai-backend` (or your choice) |
-| **Runtime** | `Python 3` |
+| **Runtime** | `Python 3` (Render will pick from `runtime.txt`) |
 | **Root Directory** | `backend` |
 | **Branch** | `main` |
-| **Build Command** | `pip install -r requirements.txt` |
+| **Build Command** | `pip install --upgrade pip && pip install -r requirements.txt` |
 | **Start Command** | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
 
 > [!IMPORTANT]
@@ -26,9 +26,9 @@ In the creation screen, use the following settings:
 
 ### 3. Environment Variables
 Add any necessary environment variables in the **Environment** tab:
-- `DATABASE_URL`: (Optional) If you're switching from SQLite to PostgreSQL. If not provided, it will use the default SQLite database.
-- `SECRET_KEY`: A secure random string for JWT (if you re-enable auth).
-- Any others found in your `backend/.env`.
+- `PYTHON_VERSION`: `3.11.9` (Alternative to `runtime.txt`)
+- `DATABASE_URL`: (Optional) If you're switching from SQLite to PostgreSQL.
+- `SECRET_KEY`: A secure random string for JWT.
 
 ### 4. Database (SQLite Note)
 If you use the default SQLite database (`unbiased_ai.db`), Render's filesystem is **ephemeral**. This means your database will be reset every time the service restarts or redeploys.
