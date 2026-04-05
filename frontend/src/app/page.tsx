@@ -159,7 +159,7 @@ export default function Home() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
           className="w-full max-w-6xl mx-auto px-6 mb-16"
         >
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { label: "Audits Run", val: stats.total, icon: <TrendingUp className="w-5 h-5 text-[#3b82f6]" />, color: "text-[#3b82f6]" },
               { label: "Fair Results", val: stats.fair, icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, color: "text-emerald-400" },
@@ -215,7 +215,7 @@ export default function Home() {
 
       {/* ── HOW IT WORKS ── */}
       <section className="w-full max-w-6xl mx-auto px-6 mb-20">
-        <div className="glass-panel p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="glass-panel p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
               className="text-2xl font-bold text-white mb-2">How it works</motion.h2>
@@ -267,7 +267,7 @@ export default function Home() {
       <section className="w-full max-w-6xl mx-auto px-6 mb-20">
         <motion.div
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="glass-panel p-12 text-center relative overflow-hidden"
+          className="glass-panel p-8 md:p-12 text-center relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6]/5 to-[#8b5cf6]/5 pointer-events-none" />
           <h2 className="text-3xl font-bold text-white mb-3 relative">Ready to audit your model?</h2>

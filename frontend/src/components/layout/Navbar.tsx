@@ -15,7 +15,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-black/60 backdrop-blur-xl flex items-center justify-between px-6 lg:px-12">
+    <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-black/60 backdrop-blur-xl flex items-center justify-between px-4 lg:px-12">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2 group">
         <div className="p-1.5 bg-[#3b82f6]/20 rounded-lg group-hover:bg-[#3b82f6]/30 transition-colors">

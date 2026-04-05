@@ -399,13 +399,13 @@ function ResultsContent() {
       </motion.div>
 
       {/* ── Tab Navigation ── */}
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-white/5 rounded-xl p-1 w-full md:w-fit overflow-x-auto custom-scrollbar">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={clsx(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all",
+              "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
               activeTab === tab.id ? "bg-[#3b82f6] text-white shadow" : "text-gray-400 hover:text-white"
             )}
           >{tab.label}</button>
