@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Ensure the baseURL ends with /api
-let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+export let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 if (baseURL && !baseURL.endsWith('/api')) {
   baseURL = `${baseURL}/api`;
 }

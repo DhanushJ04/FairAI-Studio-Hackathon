@@ -13,7 +13,7 @@ import {
   ResponsiveContainer, ReferenceLine, Cell, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar, Legend
 } from "recharts";
-import api from "@/lib/api";
+import api, { baseURL } from "@/lib/api";
 import clsx from "clsx";
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -356,7 +356,7 @@ function ResultsContent() {
       value: m.value, status: m.status,
     }));
   const overallFair = biasedMetrics.length === 0;
-  const generateReportUrl = `http://localhost:8000/api/generate-report/${reportId}`;
+  const generateReportUrl = `${baseURL}/generate-report/${reportId}`;
 
   const TABS = [
     { id: "overview", label: "Overview & Metrics" },
