@@ -56,9 +56,7 @@ export default function AuditPage() {
       const formData = new FormData();
       formData.append("file", selectedFile);
       
-      const response = await api.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      const response = await api.post("/upload", formData);
       
       setFileId(response.data.file_id);
       setColumns(response.data.columns);
