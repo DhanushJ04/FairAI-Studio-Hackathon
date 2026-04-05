@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, UploadCloud, BarChart2, FileText, Github } from "lucide-react";
+import { ShieldCheck, UploadCloud, BarChart2, FileText } from "lucide-react";
 import clsx from "clsx";
 
 export default function Navbar() {
