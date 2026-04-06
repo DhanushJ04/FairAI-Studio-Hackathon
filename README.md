@@ -113,6 +113,18 @@ This project is **Verified by Google Search Console**. The frontend includes a `
 - **Build Command:** `npm run build`
 - **Environment Variables:** `NEXTAUTH_URL` (Production URL), `NEXT_PUBLIC_API_URL` (Backend URL).
 
+
+---
+
+## 🚀 Future Scope & Roadmap
+FairAI Studio is continuously evolving. Our vision includes several key enhancements to move from a hackathon prototype to a full-scale enterprise tool:
+
+- **💾 Persistent Data Architecture:** Migrating from SQLite to **Postgres/Supabase** to ensure data persists across server restarts on Render's ephemeral filesystem.
+- **☁️ Scalable Object Storage:** Integrating **AWS S3** for secure, long-term storage of user datasets and exported PDF audit reports.
+- **🧬 Multi-Demographic Intersectionality:** Developing algorithms to detect "intersectional bias" (e.g., bias occurring at the meeting of multiple protected groups like Race AND Gender).
+- **🔌 Model Auditing APIs:** Enabling users to provide a live API endpoint for their own models, allowing FairAI Studio to run "Black-box" audits in real-time.
+- **✅ Global Compliance Badges:** Creating verifiable web-badges that companies can display to prove their models have passed an independent FairAI bias audit.
+
 ---
 
 <div align="center">
