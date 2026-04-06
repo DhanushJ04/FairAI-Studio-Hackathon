@@ -58,7 +58,7 @@ export default function Navbar() {
       </div>
 
       {/* Right: CTA / Auth */}
-      <div className="hidden md:flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         {session ? (
           <div className="flex items-center gap-3">
             {session.user?.image ? (
@@ -72,25 +72,26 @@ export default function Navbar() {
               onClick={() => signOut()}
               className="text-gray-400 hover:text-white px-2 py-1 flex items-center gap-2 text-sm transition-colors"
             >
-              <LogOut className="w-4 h-4" /> Sign Out
+              <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Sign Out</span>
             </button>
             <Link
               href="/audit"
-              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
             >
-              Run Audit →
+              <span className="hidden sm:inline">Run Audit →</span>
+              <span className="sm:hidden">Audit</span>
             </Link>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 border border-[#262626] px-2.5 py-1 rounded-full">
+            <span className="hidden lg:inline text-xs text-gray-500 border border-[#262626] px-2.5 py-1 rounded-full">
               v1.0 · Open Source
             </span>
             <button
               onClick={() => signIn("google")}
-              className="flex flex-row items-center gap-2 bg-white text-black px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+              className="flex flex-row items-center gap-2 bg-white text-black px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
-              <LogIn className="w-4 h-4" /> Sign in with Google
+              <LogIn className="w-4 h-4" /> <span className="sm:inline">Sign in</span>
             </button>
           </div>
         )}
