@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: "Advanced AI bias detection, explainability, and audit platform. Built for trust and inclusivity in machine learning.",
   keywords: ["AI Fairness", "Bias Detection", "Machine Learning Audit", "SHAP", "Fairlearn", "AIF360"],
   robots: "index, follow",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
