@@ -64,7 +64,6 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <span className="text-[11px] text-gray-600 font-medium">STATUS: SYSTEM NOMINAL</span>
-            <span className="text-[11px] text-gray-600 font-medium tracking-[0.1em]">BUILT WITH ❤️ ON NEXT.JS</span>
           </div>
         </div>
       </div>

@@ -109,7 +109,7 @@ export default function Home() {
         {/* Badge */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <span className="inline-flex items-center gap-2 text-xs bg-[#3b82f6]/10 border border-[#3b82f6]/30 text-[#3b82f6] px-4 py-1.5 rounded-full font-medium">
-            <Zap className="w-3 h-3" /> Powered by SHAP · LIME · Fairlearn · AIF360
+            <Zap className="w-3 h-3" /> Science-backed Audit & Compliance
           </span>
         </motion.div>
 
@@ -228,26 +228,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-5 font-semibold">Tech Stack</p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { l: "FastAPI", c: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
-                { l: "Next.js 16", c: "text-white border-white/20 bg-white/5" },
-                { l: "SQLite", c: "text-blue-400 border-blue-500/30 bg-blue-500/10" },
-                { l: "Fairlearn", c: "text-purple-400 border-purple-500/30 bg-purple-500/10" },
-                { l: "AIF360", c: "text-orange-400 border-orange-500/30 bg-orange-500/10" },
-                { l: "SHAP", c: "text-pink-400 border-pink-500/30 bg-pink-500/10" },
-                { l: "LIME", c: "text-yellow-400 border-yellow-500/30 bg-yellow-500/10" },
-                { l: "scikit-learn", c: "text-cyan-400 border-cyan-500/30 bg-cyan-500/10" },
-                { l: "Recharts", c: "text-indigo-400 border-indigo-500/30 bg-indigo-500/10" },
-                { l: "ReportLab PDF", c: "text-red-400 border-red-500/30 bg-red-500/10" },
-                { l: "Framer Motion", c: "text-teal-400 border-teal-500/30 bg-teal-500/10" },
-                { l: "Tailwind CSS", c: "text-sky-400 border-sky-500/30 bg-sky-500/10" },
-              ].map((b) => (
-                <TechBadge key={b.l} label={b.l} color={b.c} />
-              ))}
-            </div>
+          <div className="space-y-4">
             <div className="mt-8 glass-panel p-5 border-[#3b82f6]/20">
               <div className="flex items-center gap-2 mb-3">
                 <Brain className="w-4 h-4 text-[#8b5cf6]" />
