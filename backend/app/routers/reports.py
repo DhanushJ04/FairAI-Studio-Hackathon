@@ -78,6 +78,6 @@ async def generate_report(report_id: str, db: AsyncSession = Depends(get_db), cu
 
     return FileResponse(
         path=pdf_path,
-        filename=f"AI_Bias_Audit_{report_record.filename}.pdf",
+        filename="AI_Bias_Audit.pdf",
         media_type="application/pdf",
     )

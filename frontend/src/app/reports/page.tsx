@@ -28,6 +28,25 @@ export default function ReportsPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownload = async (report: Report) => {
+    try {
+      setDownloadingId(report.id);
+      const res = await api.get(`/generate-report/${report.id}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `AI_Bias_Audit.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download PDF.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const fetchReports = async () => {
     setLoading(true);
@@ -198,10 +217,7 @@ export default function ReportsPage() {
                       <span>Target: <span className="text-gray-300">{report.target_column}</span></span>
                       <span>Sensitive: <span className="text-gray-300">{(report.sensitive_attributes || []).join(", ")}</span></span>
                     </div>
-                    <div className="flex items-center gap-1 mt-2 text-[10px] text-gray-600">
-                      <Clock className="w-3 h-3" />
-                      {date}
-                    </div>
+                      {/* Time removed as requested */}
                   </div>
 
                   {/* Score Bar */}
@@ -222,14 +238,14 @@ export default function ReportsPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0">
-                    <a
-                      href={`http://localhost:8000/api/generate-report/${report.id}`}
-                      target="_blank" rel="noreferrer"
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    <button
+                      onClick={() => handleDownload(report)}
+                      disabled={downloadingId === report.id}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
                       title="Download PDF"
                     >
-                      <Download className="w-4 h-4" />
-                    </a>
+                      {downloadingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    </button>
                     <button
                       onClick={() => handleDelete(report.id)}
                       disabled={deletingId === report.id}

@@ -365,7 +365,7 @@ function ResultsContent() {
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `AI_Bias_Audit_${data.filename}.pdf`);
+      link.setAttribute('download', `AI_Bias_Audit.pdf`);
       document.body.appendChild(link);
       link.click();
       window.URL.revokeObjectURL(url);
