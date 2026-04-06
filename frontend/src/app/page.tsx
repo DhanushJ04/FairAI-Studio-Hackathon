@@ -109,7 +109,7 @@ export default function Home() {
         {/* Badge */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <span className="inline-flex items-center gap-2 text-xs bg-[#3b82f6]/10 border border-[#3b82f6]/30 text-[#3b82f6] px-4 py-1.5 rounded-full font-medium">
-            <Zap className="w-3 h-3" /> Science-backed Audit & Compliance
+            <Zap className="w-3 h-3" /> Powered by SHAP · LIME · Fairlearn · AIF360
           </span>
         </motion.div>
 
