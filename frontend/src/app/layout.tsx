@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import { Providers } from "@/components/Providers";
 
 const geistSans = Geist({
@@ -15,8 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FairAI Studio | Bias Detection",
-  description: "Identify and mitigate AI bias easily.",
+  title: "FairAI Studio | Bias Detection & Audit",
+  description: "Advanced AI bias detection, explainability, and audit platform. Built for trust and inclusivity in machine learning.",
+  keywords: ["AI Fairness", "Bias Detection", "Machine Learning Audit", "SHAP", "Fairlearn", "AIF360"],
+  robots: "index, follow",
 };
 
 export default function RootLayout({
@@ -32,6 +35,7 @@ export default function RootLayout({
           <main className="flex-1 flex flex-col w-full">
             {children}
           </main>
+          <Footer />
         </Providers>
       </body>
     </html>
