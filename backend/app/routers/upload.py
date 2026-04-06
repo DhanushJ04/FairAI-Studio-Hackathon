@@ -5,14 +5,19 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.config import UPLOAD_DIR
-from app.models import UploadedFile
+from app.models import UploadedFile, User
+from app.deps import get_current_active_user
 from app.schemas import UploadResponse
 from app.services.data_parser import process_data_file
 
 router = APIRouter()
 
 @router.post("/upload", response_model=UploadResponse)
-async def upload_file(file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
+async def upload_file(
+    file: UploadFile = File(...), 
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     if not file.filename.endswith(".csv") and not file.filename.endswith(".xlsx") and not file.filename.endswith((".pkl", ".joblib")):
         raise HTTPException(status_code=400, detail="Only CSV, Excel (.xlsx), or model files are supported.")
         
@@ -44,7 +49,7 @@ async def upload_file(file: UploadFile = File(...), db: AsyncSession = Depends(g
     # Save to db
     db_file = UploadedFile(
         id=file_id,
-        user_id="dummy-user-id", # Bypassing auth
+        user_id=current_user.id,
         filename=file.filename,
         filepath=filepath,
         file_type=file_type,

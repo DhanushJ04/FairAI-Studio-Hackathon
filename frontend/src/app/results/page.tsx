@@ -303,6 +303,7 @@ function ResultsContent() {
   const reportId = searchParams.get("reportId");
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const [errorMSG, setErrorMSG] = useState("");
   const [data, setData] = useState<ReportData | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "explainability" | "mitigation">("overview");
@@ -356,7 +357,24 @@ function ResultsContent() {
       value: m.value, status: m.status,
     }));
   const overallFair = biasedMetrics.length === 0;
-  const generateReportUrl = `${baseURL}/generate-report/${reportId}`;
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      const res = await api.get(`/generate-report/${reportId}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `AI_Bias_Audit_${data.filename}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download PDF. Ensure you are signed in.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const TABS = [
     { id: "overview", label: "Overview & Metrics" },
@@ -390,12 +408,14 @@ function ResultsContent() {
             <span className="text-white">{(data.sensitive_attributes || []).join(", ")}</span>
           </p>
         </div>
-        <a
-          href={generateReportUrl} target="_blank" rel="noreferrer"
-          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-[#262626] px-4 py-2.5 rounded-lg text-sm text-white transition-colors whitespace-nowrap"
+        <button
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-[#262626] px-4 py-2.5 rounded-lg text-sm text-white transition-colors whitespace-nowrap disabled:opacity-50"
         >
-          <Download className="w-4 h-4" /> Download PDF Report
-        </a>
+          {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          {downloading ? "Generating..." : "Download PDF Report"}
+        </button>
       </motion.div>
 
       {/* ── Tab Navigation ── */}

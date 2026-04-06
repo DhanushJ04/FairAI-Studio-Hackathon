@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-// Ensure the baseURL ends with /api
+import { getSession } from 'next-auth/react';
+
 export let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 if (baseURL && !baseURL.endsWith('/api')) {
   baseURL = `${baseURL}/api`;
@@ -8,8 +9,14 @@ if (baseURL && !baseURL.endsWith('/api')) {
 
 const api = axios.create({
   baseURL,
-  // Let Axios automatically determine Content-Type.
-  // This is crucial for form data (file uploads) so Axios can automatically attach the boundary token.
+});
+
+api.interceptors.request.use(async (config) => {
+  const session = await getSession();
+  if (session?.apiToken) {
+    config.headers.Authorization = `Bearer ${session.apiToken}`;
+  }
+  return config;
 });
 
 export default api;

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, UploadCloud, BarChart2, FileText } from "lucide-react";
+import { ShieldCheck, UploadCloud, FileText, LogIn, LogOut } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import clsx from "clsx";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const links = [
     { name: "Home", href: "/", icon: ShieldCheck },
@@ -55,17 +57,43 @@ export default function Navbar() {
         })}
       </div>
 
-      {/* Right: CTA */}
+      {/* Right: CTA / Auth */}
       <div className="hidden md:flex items-center gap-3">
-        <span className="text-xs text-gray-500 border border-[#262626] px-2.5 py-1 rounded-full">
-          v1.0 · Open Source
-        </span>
-        <Link
-          href="/audit"
-          className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
-        >
-          Run Audit →
-        </Link>
+        {session ? (
+          <div className="flex items-center gap-3">
+            {session.user?.image ? (
+              <img src={session.user.image} alt="User Profile" className="w-8 h-8 rounded-full border border-white/20" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-[#3b82f6] text-white flex items-center justify-center font-bold text-sm">
+                {session.user?.name?.[0]?.toUpperCase() || "U"}
+              </div>
+            )}
+            <button
+              onClick={() => signOut()}
+              className="text-gray-400 hover:text-white px-2 py-1 flex items-center gap-2 text-sm transition-colors"
+            >
+              <LogOut className="w-4 h-4" /> Sign Out
+            </button>
+            <Link
+              href="/audit"
+              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+            >
+              Run Audit →
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 border border-[#262626] px-2.5 py-1 rounded-full">
+              v1.0 · Open Source
+            </span>
+            <button
+              onClick={() => signIn("google")}
+              className="flex flex-row items-center gap-2 bg-white text-black px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
+              <LogIn className="w-4 h-4" /> Sign in with Google
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

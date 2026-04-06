@@ -4,18 +4,19 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from app.database import get_db
-from app.models import AuditReport
+from app.models import AuditReport, User
+from app.deps import get_current_active_user
 from app.services.pdf_generator import generate_pdf_report
 
 router = APIRouter()
 
 
 @router.get("/reports")
-async def list_reports(db: AsyncSession = Depends(get_db)):
+async def list_reports(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Returns a list of all completed audit reports."""
     result = await db.execute(
         select(AuditReport)
-        .where(AuditReport.status == "completed")
+        .where(AuditReport.status == "completed", AuditReport.user_id == current_user.id)
         .order_by(desc(AuditReport.created_at))
     )
     reports = result.scalars().all()
@@ -35,9 +36,9 @@ async def list_reports(db: AsyncSession = Depends(get_db)):
 
 
 @router.delete("/reports/{report_id}")
-async def delete_report(report_id: str, db: AsyncSession = Depends(get_db)):
+async def delete_report(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Deletes an audit report by ID."""
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id))
+    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
     report = result.scalars().first()
     if not report:
         raise HTTPException(status_code=404, detail="Report not found.")
@@ -47,9 +48,9 @@ async def delete_report(report_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/generate-report/{report_id}")
-async def generate_report(report_id: str, db: AsyncSession = Depends(get_db)):
+async def generate_report(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Generates and streams a PDF audit report."""
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id))
+    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
     report_record = result.scalars().first()
 
     if not report_record:

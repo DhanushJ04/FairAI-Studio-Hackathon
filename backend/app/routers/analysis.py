@@ -7,7 +7,8 @@ from sqlalchemy import select
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from app.database import get_db
-from app.models import UploadedFile, AuditReport
+from app.models import UploadedFile, AuditReport, User
+from app.deps import get_current_active_user
 from app.schemas import AnalysisRequest, AnalysisResponse
 from app.services.data_parser import load_data
 from app.services.bias_detector import calculate_bias_metrics
@@ -17,9 +18,9 @@ from app.services.mitigator import generate_mitigation_strategies
 router = APIRouter()
 
 @router.post("/analyze-bias", response_model=AnalysisResponse)
-async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_db)):
+async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     # 1. Fetch file info
-    result = await db.execute(select(UploadedFile).where(UploadedFile.id == request.file_id))
+    result = await db.execute(select(UploadedFile).where(UploadedFile.id == request.file_id, UploadedFile.user_id == current_user.id))
     file_record = result.scalars().first()
     if not file_record:
         raise HTTPException(status_code=404, detail="File not found.")
@@ -67,7 +68,7 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
     # 3. Model Handling
     model = None
     if request.model_file_id:
-        m_res = await db.execute(select(UploadedFile).where(UploadedFile.id == request.model_file_id))
+        m_res = await db.execute(select(UploadedFile).where(UploadedFile.id == request.model_file_id, UploadedFile.user_id == current_user.id))
         m_record = m_res.scalars().first()
         if m_record and os.path.exists(m_record.filepath):
             try:
@@ -95,7 +96,7 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
     
     # 8. Save Report to DB
     report = AuditReport(
-        user_id="dummy-user-id",
+        user_id=current_user.id,
         file_id=request.file_id,
         filename=file_record.filename,
         target_column=request.target_column,
@@ -131,15 +132,15 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
     }
 
 @router.get("/metrics/{report_id}")
-async def get_metrics(report_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id))
+async def get_metrics(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
     report = result.scalars().first()
     if not report: raise HTTPException(404, "Report not found")
     return {"metrics": report.metrics_json, "group_metrics": report.group_metrics_json}
 
 @router.get("/summary/{report_id}")
-async def get_summary(report_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id))
+async def get_summary(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
     report = result.scalars().first()
     if not report: raise HTTPException(404, "Report not found")
     return {
@@ -157,8 +158,8 @@ async def get_summary(report_id: str, db: AsyncSession = Depends(get_db)):
     }
 
 @router.get("/mitigation/{report_id}")
-async def get_mitigation(report_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id))
+async def get_mitigation(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
     report = result.scalars().first()
     if not report: raise HTTPException(404, "Report not found")
     return {"mitigations": report.mitigation_json}
