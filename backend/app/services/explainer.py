@@ -9,20 +9,26 @@ def calculate_shap(model, X: pd.DataFrame, is_tree=False) -> List[Dict[str, Any]
     except ImportError:
         print("SHAP is not installed, returning empty list.")
         return []
-    # Subsample for speed
-    X_sample = shap.sample(X, 100) if len(X) > 100 else X
+    # Subsample background data for speed
+    # A smaller background sample is usually sufficient for global importance
+    bg_sample_size = 50 if len(X) > 500 else 100
+    X_sample = shap.sample(X, bg_sample_size) if len(X) > bg_sample_size else X
     
     try:
         if is_tree:
+            # TreeExplainer is much faster for Random Forest
             explainer = shap.TreeExplainer(model)
-            shap_values = explainer.shap_values(X_sample)
+            # Use smaller subset for SHAP values to avoid OOM or timeout
+            val_sample = shap.sample(X, 100) if len(X) > 100 else X
+            shap_values = explainer.shap_values(val_sample)
         else:
             explainer = shap.Explainer(model, X_sample)
             shap_values = explainer(X_sample).values
             
         # For classification, shap_values might be a list of arrays (one per class). We take class 1.
         if isinstance(shap_values, list):
-            shap_values = shap_values[1]
+            # If multiple classes (usually 2 for classification), take the positive class (1)
+            shap_values = shap_values[1] if len(shap_values) > 1 else shap_values[0]
             
         # If 3D array (e.g. from multiclass), take mean over classes or just 1st class
         if len(shap_values.shape) == 3:
@@ -32,9 +38,16 @@ def calculate_shap(model, X: pd.DataFrame, is_tree=False) -> List[Dict[str, Any]
         
         features = X.columns
         result = []
+        # Ensure we have data for correlation
+        current_X = val_sample if is_tree else X_sample
+        
         for i, f in enumerate(features):
             # approximate direction by looking at correlation of feature value and shap value
-            corr = np.corrcoef(X_sample.iloc[:, i], shap_values[:, i])[0, 1] if len(X_sample) > 1 else 1.0
+            if len(current_X) > 1:
+                corr = np.corrcoef(current_X.iloc[:, i], shap_values[:, i])[0, 1]
+            else:
+                corr = 1.0
+                
             direction = "positive" if corr > 0 else "negative"
             # Handle NaN correlation
             if np.isnan(corr): direction = "positive"

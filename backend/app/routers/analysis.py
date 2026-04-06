@@ -77,7 +77,7 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
                 raise HTTPException(status_code=400, detail=f"Could not load model: {str(e)}")
     
     if model is None:
-        model = RandomForestClassifier(n_estimators=50, random_state=42)
+        model = RandomForestClassifier(n_estimators=50, random_state=42, n_jobs=1)
         model.fit(X, y)
         
     # 4. Predictions

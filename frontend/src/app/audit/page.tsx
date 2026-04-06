@@ -140,7 +140,11 @@ export default function AuditPage() {
       router.push(`/results?reportId=${reportId}`);
     } catch (err: any) {
       console.error(err);
-      setErrorMSG(err.response?.data?.detail || "Failed to analyze bias. The process might have timed out or failed.");
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setErrorMSG("The analysis is taking longer than expected due to dataset size. Please try again or use a smaller sample.");
+      } else {
+        setErrorMSG(err.response?.data?.detail || "Failed to analyze bias. The process might have timed out or failed.");
+      }
       setIsAnalyzing(false);
     }
   };

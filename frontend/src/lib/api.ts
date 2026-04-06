@@ -9,6 +9,7 @@ if (baseURL && !baseURL.endsWith('/api')) {
 
 const api = axios.create({
   baseURL,
+  timeout: 120000, // 2 minute timeout for analysis tasks
 });
 
 api.interceptors.request.use(async (config) => {

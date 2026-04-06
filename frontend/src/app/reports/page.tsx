@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText, Download, Trash2, AlertTriangle, CheckCircle, Loader2,
@@ -23,6 +24,7 @@ interface Report {
 
 export default function ReportsPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,7 +50,8 @@ export default function ReportsPage() {
     }
   };
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
+    if (status !== "authenticated") return;
     setLoading(true);
     setError("");
     try {
@@ -59,9 +62,16 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [status]);
 
-  useEffect(() => { fetchReports(); }, []);
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchReports();
+    } else if (status === "unauthenticated") {
+      setLoading(false);
+      setError("Not authenticated");
+    }
+  }, [status, fetchReports]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this report permanently?")) return;
