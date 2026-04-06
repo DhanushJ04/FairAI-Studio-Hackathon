@@ -19,6 +19,7 @@
 - **Google OAuth 2.0 Integration:** Seamless and secure authentication via Google accounts.
 - **Data Isolation:** User-specific dashboards ensure that datasets and audit reports are securely partitioned between accounts.
 - **JWT-Based Authorization:** Secure communication between the FastAPI backend and Next.js frontend using JSON Web Tokens.
+- **Mobile Accessible UI:** Fully responsive design with a dedicated mobile hamburger menu for audit management on any device.
 
 ---
 
