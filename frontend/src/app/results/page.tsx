@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, Suspense, useMemo } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertTriangle, Download, Info, CheckCircle, ArrowRight, ShieldCheck,
@@ -56,10 +55,10 @@ function TooltipIcon({ text }: { text: string }) {
 function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
   return (
     <div className="flex items-start gap-3 mb-6">
-      <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 mt-0.5">{icon}</div>
+      <div className="p-2 rounded-lg bg-white/5 mt-0.5">{icon}</div>
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
-        {subtitle && <p className="text-xs text-slate-500 dark:text-gray-400 mt-0.5">{subtitle}</p>}
+        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );
@@ -127,25 +126,25 @@ function MetricCard({ metric }: { metric: Metric }) {
     >
       <div className={`absolute top-0 left-0 w-1 h-full ${isBiased ? "bg-red-500" : "bg-emerald-500"}`} />
       <div className="flex items-start justify-between pl-2">
-        <p className="text-xs text-slate-500 dark:text-gray-400 leading-snug max-w-[75%]">{metric.name}</p>
+        <p className="text-xs text-gray-400 leading-snug max-w-[75%]">{metric.name}</p>
         <span className={clsx(
           "text-[10px] px-2 py-0.5 rounded-full font-semibold border shrink-0",
-          isBiased ? "bg-red-500/15 text-red-500 dark:text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+          isBiased ? "bg-red-500/15 text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
         )}>
           {isBiased ? "BIASED" : "FAIR"}
         </span>
       </div>
       <div className="flex items-end gap-2 pl-2">
-        <span className={clsx("text-2xl font-bold", isBiased ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")}>{displayVal}</span>
-        <span className="text-[10px] text-slate-500 dark:text-gray-500 mb-1">threshold: {isDI ? "≥" : "|x|≤"}{metric.threshold}</span>
+        <span className={clsx("text-2xl font-bold", isBiased ? "text-red-400" : "text-emerald-400")}>{displayVal}</span>
+        <span className="text-[10px] text-gray-500 mb-1">threshold: {isDI ? "≥" : "|x|≤"}{metric.threshold}</span>
       </div>
-      <p className="text-[10px] text-slate-500 dark:text-gray-500 pl-2 leading-relaxed">{metric.description}</p>
+      <p className="text-[10px] text-gray-500 pl-2 leading-relaxed">{metric.description}</p>
     </motion.div>
   );
 }
 
 /* ─── Fairness Radar ─────────────────────────────────────────── */
-function FairnessRadar({ metrics, isDark }: { metrics: Metric[]; isDark: boolean }) {
+function FairnessRadar({ metrics }: { metrics: Metric[] }) {
   // Normalize metrics to 0-1 scale for radar (1 = perfectly fair)
   const radarData = metrics.map((m) => {
     let fairness: number;
@@ -168,40 +167,44 @@ function FairnessRadar({ metrics, isDark }: { metrics: Metric[]; isDark: boolean
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={radarData} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
-          <PolarGrid stroke={isDark ? "#262626" : "#e2e8f0"} />
-          <PolarAngleAxis dataKey="metric" tick={{ fill: isDark ? "#9ca3af" : "#64748b", fontSize: 10 }} />
-          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: isDark ? "#666" : "#94a3b8", fontSize: 9 }} />
+          <PolarGrid stroke="#262626" />
+          <PolarAngleAxis dataKey="metric" tick={{ fill: "#9ca3af", fontSize: 10 }} />
+          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#666", fontSize: 9 }} />
           <Radar name="Fairness" dataKey="fairness" stroke={COLORS.primary} fill={COLORS.primary} fillOpacity={0.2} strokeWidth={2} />
           <RechartsTooltip
-            contentStyle={{ backgroundColor: isDark ? "#111113" : "#fff", borderColor: isDark ? "#262626" : "#e2e8f0", borderRadius: "8px", color: isDark ? "#fff" : "#0f172a", fontSize: "12px" }}
+            contentStyle={{ backgroundColor: "#111113", borderColor: "#262626", borderRadius: "8px", color: "#fff", fontSize: "12px" }}
             formatter={(v: any) => [`${v}%`, "Fairness Score"]}
           />
         </RadarChart>
       </ResponsiveContainer>
     </div>
+  );
 }
- 
+
 /* ─── Group Comparison Chart ─────────────────────────────────── */
-function GroupComparisonChart({ groupMetrics, isDark }: { groupMetrics: GroupMetric[]; isDark: boolean }) {
-  const chartData = useMemo(() => groupMetrics.map((g) => ({
+function GroupComparisonChart({ groupMetrics }: { groupMetrics: GroupMetric[] }) {
+  // Pivot by group_name; show positive_rate per group_value
+  const groups = [...new Set(groupMetrics.map((g) => g.group_name))];
+  const chartData = groupMetrics.map((g) => ({
     name: `${g.group_name}: ${g.group_value}`,
     "Positive Rate": parseFloat((g.positive_rate * 100).toFixed(1)),
     "True Pos. Rate": parseFloat((g.true_positive_rate * 100).toFixed(1)),
     "False Pos. Rate": parseFloat((g.false_positive_rate * 100).toFixed(1)),
-  })), [groupMetrics]);
+    count: g.count,
+  }));
 
   return (
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f1f23" : "#f1f5f9"} vertical={false} />
-          <XAxis dataKey="name" stroke={isDark ? "#555" : "#64748b"} fontSize={10} tickLine={false} axisLine={false} angle={-30} textAnchor="end" interval={0} />
-          <YAxis stroke={isDark ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1f1f23" vertical={false} />
+          <XAxis dataKey="name" stroke="#555" fontSize={10} tickLine={false} axisLine={false} angle={-30} textAnchor="end" interval={0} />
+          <YAxis stroke="#555" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
           <RechartsTooltip
-            cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}
-            contentStyle={{ backgroundColor: isDark ? "#111113" : "#fff", borderColor: isDark ? "#262626" : "#e2e8f0", borderRadius: "8px", color: isDark ? "#fff" : "#0f172a", fontSize: "12px" }}
+            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+            contentStyle={{ backgroundColor: "#111113", borderColor: "#262626", borderRadius: "8px", color: "#fff", fontSize: "12px" }}
           />
-          <Legend wrapperStyle={{ fontSize: "11px", pt: 20 }} />
+          <Legend wrapperStyle={{ fontSize: "11px", bottom: 0 }} />
           <Bar dataKey="Positive Rate" fill={COLORS.primary} radius={[3, 3, 0, 0]} maxBarSize={30} />
           <Bar dataKey="True Pos. Rate" fill={COLORS.fair} radius={[3, 3, 0, 0]} maxBarSize={30} />
           <Bar dataKey="False Pos. Rate" fill={COLORS.biased} radius={[3, 3, 0, 0]} maxBarSize={30} />
@@ -216,22 +219,22 @@ function LimeCard({ instance }: { instance: LimeInstance }) {
   const [open, setOpen] = useState(false);
   const maxW = Math.max(...instance.features.map((f) => Math.abs(f.weight)));
   return (
-    <div className="bg-slate-50 dark:bg-white/5 rounded-lg border border-[var(--panel-border)] overflow-hidden">
+    <div className="bg-white/5 rounded-lg border border-[#262626] overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors"
       >
         <span className="font-medium">
           Instance #{instance.instance_index + 1} — Predicted:{" "}
-          <span className={instance.prediction === 1 ? "text-emerald-500" : "text-red-500"}>
+          <span className={instance.prediction === 1 ? "text-emerald-400" : "text-red-400"}>
             Class {instance.prediction}
           </span>
         </span>
-        {open ? <ChevronUp className="w-4 h-4 text-slate-400 dark:text-gray-400" /> : <ChevronDown className="w-4 h-4 text-slate-400 dark:text-gray-400" />}
+        {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
       <AnimatePresence>
         {open && (
-            <motion.div
+          <motion.div
             initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }} className="overflow-hidden"
           >
@@ -241,14 +244,14 @@ function LimeCard({ instance }: { instance: LimeInstance }) {
                 const pos = f.weight > 0;
                 return (
                   <div key={i} className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 w-36 shrink-0 truncate">{f.feature}</span>
-                    <div className="flex-1 bg-slate-200 dark:bg-[#1a1a1a] rounded-full h-2 overflow-hidden">
+                    <span className="text-[10px] text-gray-400 w-36 shrink-0 truncate">{f.feature}</span>
+                    <div className="flex-1 bg-[#1a1a1a] rounded-full h-2 overflow-hidden">
                       <div
                         className="h-2 rounded-full transition-all"
                         style={{ width: `${pct}%`, backgroundColor: pos ? COLORS.fair : COLORS.biased }}
                       />
                     </div>
-                    <span className={clsx("text-[10px] font-mono w-14 text-right", pos ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
+                    <span className={clsx("text-[10px] font-mono w-14 text-right", pos ? "text-emerald-400" : "text-red-400")}>
                       {f.weight >= 0 ? "+" : ""}{f.weight.toFixed(3)}
                     </span>
                   </div>
@@ -272,22 +275,22 @@ const categoryColor: Record<string, string> = {
 const severityDot: Record<string, string> = { high: "bg-red-500", medium: "bg-amber-500", low: "bg-emerald-500" };
 
 function MitigationCard({ m }: { m: Mitigation }) {
-  const catCls = categoryColor[m.category] || "text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-500/30 bg-slate-100 dark:bg-gray-500/10";
+  const catCls = categoryColor[m.category] || "text-gray-400 border-gray-500/30 bg-gray-500/10";
   return (
     <div className="glass-panel p-5 hover:border-[#3b82f6]/40 transition-colors">
       <div className="flex items-start justify-between gap-4 mb-3">
-        <h3 className="font-semibold text-slate-900 dark:text-white text-sm">{m.name}</h3>
+        <h3 className="font-semibold text-white text-sm">{m.name}</h3>
         <div className="flex items-center gap-2 shrink-0">
           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${catCls}`}>{m.category}</span>
           {m.recommended && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium">★ Recommended</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 font-medium">★ Recommended</span>
           )}
         </div>
       </div>
-      <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed mb-3">{m.description}</p>
+      <p className="text-xs text-gray-400 leading-relaxed mb-3">{m.description}</p>
       <div className="flex items-center gap-2">
         <div className={`w-2 h-2 rounded-full ${severityDot[m.severity] || "bg-gray-500"}`} />
-        <span className="text-[10px] text-slate-400 dark:text-gray-500 capitalize">{m.severity} severity</span>
+        <span className="text-[10px] text-gray-500 capitalize">{m.severity} severity</span>
       </div>
     </div>
   );
@@ -357,53 +360,58 @@ function ResultsContent() {
 
   const handleDownload = async () => {
     try {
-      set      {/* ── Header ── */}
+      setDownloading(true);
+      const res = await api.get(`/generate-report/${reportId}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `AI_Bias_Audit.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download PDF. Ensure you are signed in.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const TABS = [
+    { id: "overview", label: "Overview & Metrics" },
+    { id: "explainability", label: "Explainability" },
+    { id: "mitigation", label: "Mitigations" },
+  ];
+
+  return (
+    <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-8 flex flex-col pt-24 space-y-6">
+      {/* ── Header ── */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--panel-border)] pb-6">
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#262626] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <button onClick={() => router.push("/audit")} className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <button onClick={() => router.push("/audit")} className="text-gray-500 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs text-slate-500 dark:text-gray-500">Bias Audit Report</span>
+            <span className="text-xs text-gray-500">Bias Audit Report</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3 flex-wrap">
             {data.filename}
             <span className={clsx(
               "text-sm px-3 py-1 rounded-full font-medium border",
-              overallFair ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30"
+              overallFair ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-red-500/20 text-red-400 border-red-500/30"
             )}>
               {overallFair ? "✓ Fair & Balanced" : `⚠ ${biasedMetrics.length} Bias Alert${biasedMetrics.length > 1 ? "s" : ""}`}
             </span>
           </h1>
-          <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">
-            Target: <span className="text-slate-900 dark:text-white font-medium">{data.target_column}</span> · Sensitive:{" "}
-            <span className="text-slate-900 dark:text-white font-medium">{(data.sensitive_attributes || []).join(", ")}</span>
+          <p className="text-sm text-gray-400 mt-1">
+            Target: <span className="text-white">{data.target_column}</span> · Sensitive:{" "}
+            <span className="text-white">{(data.sensitive_attributes || []).join(", ")}</span>
           </p>
         </div>
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white transition-colors whitespace-nowrap disabled:opacity-50"
-        >
-          {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          {downloading ? "Generating..." : "Download PDF Report"}
-        </button>
-      </motion.div>
-
-      {/* ── Tab Navigation ── */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-white/5 rounded-xl p-1 w-full md:w-fit overflow-x-auto custom-scrollbar">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={clsx(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.id ? "bg-[#3b82f6] text-white shadow" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
-            )}
-          >{tab.label}</button>
-        ))}
-      </div>ansition-colors whitespace-nowrap disabled:opacity-50"
+          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-[#262626] px-4 py-2.5 rounded-lg text-sm text-white transition-colors whitespace-nowrap disabled:opacity-50"
         >
           {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           {downloading ? "Generating..." : "Download PDF Report"}
@@ -431,16 +439,16 @@ function ResultsContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Fairness Score Gauge */}
             <div className="glass-panel p-6 flex flex-col items-center justify-center">
-              <p className="text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-4">Overall Fairness Score</p>
-              <ScoreGauge score={data.overall_score} theme={resolvedTheme || "dark"} />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Overall Fairness Score</p>
+              <ScoreGauge score={data.overall_score} />
               <div className="mt-3 grid grid-cols-2 gap-3 w-full text-center">
-                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2">
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">{metrics.filter(m => m.status === "fair").length}</p>
-                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Fair Metrics</p>
+                <div className="bg-white/5 rounded-lg py-2">
+                  <p className="text-lg font-bold text-white">{metrics.filter(m => m.status === "fair").length}</p>
+                  <p className="text-[10px] text-emerald-400">Fair Metrics</p>
                 </div>
-                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2">
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">{biasedMetrics.length}</p>
-                  <p className="text-[10px] text-red-600 dark:text-red-400">Bias Alerts</p>
+                <div className="bg-white/5 rounded-lg py-2">
+                  <p className="text-lg font-bold text-white">{biasedMetrics.length}</p>
+                  <p className="text-[10px] text-red-400">Bias Alerts</p>
                 </div>
               </div>
             </div>
@@ -571,7 +579,7 @@ function ResultsContent() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <p className="text-sm text-slate-500 dark:text-gray-500">SHAP explanations are not available for this report.</p>
+              <p className="text-sm text-gray-500">SHAP explanations are not available for this report.</p>
             )}
           </div>
 
@@ -611,8 +619,8 @@ function ResultsContent() {
 
           {/* Methodology Note */}
           <div className="glass-panel p-6 border-[#3b82f6]/20">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Mitigation Strategy Guide</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-500 dark:text-gray-400">
+            <h3 className="text-sm font-semibold text-white mb-3">Mitigation Strategy Guide</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-400">
               <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
                 <p className="text-amber-400 font-semibold mb-2">Pre-processing</p>
                 <p>Applied to training data before model training. Techniques: Reweighing, Disparate Impact Remover, Sampling strategies.</p>

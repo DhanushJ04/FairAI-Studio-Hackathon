@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}>
       <body className="min-h-screen flex flex-col pt-16"> {/* pd-16 for fixed navbar */}
         <Providers>
           <Navbar />

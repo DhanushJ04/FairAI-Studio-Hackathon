@@ -5,7 +5,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 backdrop-blur-md pt-16 pb-8 mt-auto">
+    <footer className="w-full border-t border-white/5 bg-black/20 backdrop-blur-md pt-16 pb-8 mt-auto">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
@@ -14,38 +14,38 @@ export default function Footer() {
               <div className="p-1.5 rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/20 transition-all">
                 <Scale className="w-5 h-5 text-[#3b82f6]" strokeWidth={2.5} />
               </div>
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-[#3b82f6] transition-colors">
+              <span className="text-lg font-bold tracking-tight text-white group-hover:text-[#3b82f6] transition-colors">
                 FairAI <span className="text-[#3b82f6]">Studio</span>
               </span>
             </Link>
-            <p className="text-slate-500 dark:text-gray-500 text-sm leading-relaxed">
+            <p className="text-gray-500 text-sm leading-relaxed">
               Advanced AI bias detection, explainability, and audit platform helping you build more inclusive and trustworthy machine learning systems.
             </p>
           </div>
 
           {/* Contact with us */}
           <div className="col-span-1">
-            <h4 className="text-slate-900 dark:text-white font-semibold mb-6 text-sm">Contact with us:</h4>
+            <h4 className="text-white font-semibold mb-6 text-sm">Contact with us:</h4>
             <div className="space-y-6">
               <div>
-                <p className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Business Inquiry:
                 </p>
-                <a href="mailto:fairaistudio@gmail.com" className="flex items-center gap-3 text-slate-600 dark:text-gray-300 hover:text-[#3b82f6] transition-colors group">
-                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
+                <a href="mailto:fairaistudio@gmail.com" className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group">
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium">fairaistudio@gmail.com</span>
                 </a>
               </div>
               <div>
-                <p className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Support & Queries:
                 </p>
-                <a href="mailto:fairaistudio.support@gmail.com" className="flex items-center gap-3 text-slate-600 dark:text-gray-300 hover:text-[#3b82f6] transition-colors group">
-                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
+                <a href="mailto:fairaistudio.support@gmail.com" className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group">
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium">fairaistudio.support@gmail.com</span>
@@ -56,18 +56,18 @@ export default function Footer() {
 
           {/* Links */}
           <div className="col-span-1">
-            <h4 className="text-slate-900 dark:text-white font-semibold mb-6 text-sm">Platform</h4>
+            <h4 className="text-white font-semibold mb-6 text-sm">Platform</h4>
             <ul className="space-y-4">
-              <li><Link href="/audit" className="text-slate-500 dark:text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
+              <li><Link href="/audit" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
                 Safety Audit
               </Link></li>
-              <li><Link href="/reports" className="text-slate-500 dark:text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
+              <li><Link href="/reports" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
                 Audit Reports
               </Link></li>
-              <li><Link href="/reports" className="text-slate-500 dark:text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
-                <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
+              <li><Link href="/reports" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
+                <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
                 Compliance Reports
               </Link></li>
             </ul>
@@ -75,16 +75,16 @@ export default function Footer() {
 
           {/* Legal Trust Signals */}
           <div className="col-span-1">
-            <h4 className="text-slate-900 dark:text-white font-semibold mb-6 text-sm">Legal & Safety</h4>
+            <h4 className="text-white font-semibold mb-6 text-sm">Legal & Safety</h4>
             <ul className="space-y-4">
-              <li><Link href="/privacy-policy" className="text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white text-sm transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms-of-service" className="text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white text-sm transition-colors">Terms of Service</Link></li>
+              <li><Link href="/privacy-policy" className="text-gray-500 hover:text-white text-sm transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-gray-500 hover:text-white text-sm transition-colors">Terms of Service</Link></li>
               <li className="pt-2 group/tip relative">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-500 text-[10px] font-bold uppercase tracking-wider cursor-help transition-all hover:bg-emerald-500/20">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-wider cursor-help transition-all hover:bg-emerald-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" /> Secure Platform
                 </div>
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-slate-900 dark:bg-[#1a1a1a] border border-slate-700 dark:border-white/10 rounded-lg text-[10px] text-slate-300 dark:text-gray-400 opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none shadow-xl">
+                <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-[#1a1a1a] border border-white/10 rounded-lg text-[10px] text-gray-400 opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none shadow-xl">
                   All file uploads are processed in-memory and never stored permanently.
                 </div>
               </li>
@@ -93,8 +93,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-          <p className="text-slate-400 dark:text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em]">
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em]">
             &copy; {currentYear} FairAI Studio. Built for Ethical AI Enforcement.
           </p>
           <div className="flex items-center gap-6 text-[10px] font-bold tracking-[0.1em]">

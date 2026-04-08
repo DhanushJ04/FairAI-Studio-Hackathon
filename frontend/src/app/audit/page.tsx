@@ -152,8 +152,8 @@ export default function AuditPage() {
   return (
     <div className="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col pt-24">
       <div className="mb-10 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 dark:text-white">Start Bias Audit</h1>
-        <p className="text-slate-500 dark:text-slate-400">Upload your dataset and select the attributes you want to test for fairness.</p>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">Start Bias Audit</h1>
+        <p className="text-gray-400">Upload your dataset and select the attributes you want to test for fairness.</p>
       </div>
 
       {errorMSG && (
@@ -167,7 +167,7 @@ export default function AuditPage() {
         {/* Upload Section */}
         <div className="flex flex-col gap-6">
           <div className="glass-panel p-6 flex flex-col h-full">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--primary)] text-xs text-white">1</span>
               Upload Dataset
             </h2>
@@ -175,7 +175,7 @@ export default function AuditPage() {
             <div 
               className={clsx(
                 "flex-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-8 transition-all relative overflow-hidden",
-                dragActive ? "border-[var(--primary)] bg-[var(--primary)]/5" : "border-[var(--panel-border)] bg-slate-50 dark:bg-black/20 hover:border-slate-400 dark:hover:border-gray-500",
+                dragActive ? "border-[var(--primary)] bg-[var(--primary)]/5" : "border-[var(--panel-border)] bg-black/20 hover:border-gray-500",
                 file ? "border-[var(--success)]/50" : ""
               )}
               onDragEnter={handleDrag}
@@ -194,17 +194,17 @@ export default function AuditPage() {
                 ) : file ? (
                   <motion.div key="file" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center">
                     <CheckCircle2 className="w-12 h-12 text-[var(--success)] mb-3" />
-                    <p className="text-slate-900 dark:text-white font-medium break-all">{file.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{(file.size / 1024).toFixed(2)} KB • Tabular Format</p>
-                    <button onClick={clearFile} disabled={isAnalyzing} className="mt-4 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 disabled:opacity-50">
+                    <p className="text-white font-medium break-all">{file.name}</p>
+                    <p className="text-xs text-gray-500 mt-1">{(file.size / 1024).toFixed(2)} KB • Tabular Format</p>
+                    <button onClick={clearFile} disabled={isAnalyzing} className="mt-4 text-xs text-gray-400 hover:text-white flex items-center gap-1 disabled:opacity-50">
                       <X className="w-3 h-3"/> Remove File
                     </button>
                   </motion.div>
                 ) : (
                   <motion.label key="upload" htmlFor="fileDownload" className="flex flex-col items-center text-center cursor-pointer w-full h-full justify-center">
-                    <UploadCloud className={clsx("w-12 h-12 mb-4 transition-colors", dragActive ? "text-[var(--primary)]" : "text-slate-400 dark:text-gray-500")} />
-                    <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">Drag and drop your file here</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">or click to browse (CSV or Excel format)</p>
+                    <UploadCloud className={clsx("w-12 h-12 mb-4 transition-colors", dragActive ? "text-[var(--primary)]" : "text-gray-500")} />
+                    <p className="text-sm font-medium text-white mb-1">Drag and drop your file here</p>
+                    <p className="text-xs text-gray-500">or click to browse (CSV or Excel format)</p>
                   </motion.label>
                 )}
               </AnimatePresence>
@@ -212,8 +212,8 @@ export default function AuditPage() {
 
             {/* Preview Section */}
             {previewData.length > 0 && (
-              <div className="mt-6 border border-[var(--panel-border)] rounded-lg overflow-hidden bg-white dark:bg-black/40">
-                <div className="bg-slate-50 dark:bg-white/5 py-2 px-4 border-b border-[var(--panel-border)] text-xs font-semibold text-slate-500 dark:text-gray-400">
+              <div className="mt-6 border border-[var(--panel-border)] rounded-lg overflow-hidden bg-black/40">
+                <div className="bg-white/5 py-2 px-4 border-b border-[var(--panel-border)] text-xs font-semibold text-gray-400">
                   Data Preview (First few rows)
                 </div>
                 <div className="overflow-x-auto">
@@ -222,7 +222,7 @@ export default function AuditPage() {
                       {previewData.map((row, idx) => (
                         <tr key={idx} className="border-b border-[var(--panel-border)]/50 last:border-0 hover:bg-white/5">
                           {row.map((cell, cIdx) => (
-                            <td key={cIdx} className={clsx("px-3 py-2", idx === 0 ? "font-bold text-slate-900 dark:text-gray-200" : "text-slate-600 dark:text-gray-400")}>{cell}</td>
+                            <td key={cIdx} className={clsx("px-3 py-2", idx === 0 ? "font-bold text-gray-200" : "text-gray-400")}>{cell}</td>
                           ))}
                         </tr>
                       ))}
@@ -237,49 +237,49 @@ export default function AuditPage() {
         {/* Configuration Section */}
         <div className="flex flex-col gap-6">
           <div className="glass-panel p-6 flex-1 flex flex-col">
-            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2 text-slate-900 dark:text-white">
+            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2 text-white">
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--primary)] text-xs text-white">2</span>
               Configure Analysis
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Select the target variable and sensitive attributes for auditing.</p>
+            <p className="text-xs text-gray-400 mb-6">Select the target variable and sensitive attributes for auditing.</p>
 
             {columns.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-sm text-slate-500 dark:text-gray-500 border border-dashed border-[var(--panel-border)] rounded-lg p-6 text-center">
+              <div className="flex-1 flex items-center justify-center text-sm text-gray-500 border border-dashed border-[var(--panel-border)] rounded-lg p-6 text-center">
                 Upload a dataset to configure the analysis.
               </div>
             ) : (
               <div className="space-y-6 flex-1">
                 {/* Target Column */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">Target Variable</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">Target Variable</label>
                   <select 
                     value={targetColumn} 
                     onChange={e => setTargetColumn(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-black/50 border border-[var(--panel-border)] rounded-lg px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[var(--primary)] transition-colors"
+                    className="w-full bg-black/50 border border-[var(--panel-border)] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--primary)] transition-colors"
                   >
-                    <option value="" disabled className="text-slate-500">Select the column to predict...</option>
+                    <option value="" disabled>Select the column to predict...</option>
                     {columns.map(col => (
-                      <option key={`target-${col.name}`} value={col.name} className="bg-white dark:bg-[#1a1a1a] text-slate-900 dark:text-white">{col.name}</option>
+                      <option key={`target-${col.name}`} value={col.name}>{col.name}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Favorable Label */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-2">Favorable Outcome Label</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-2">Favorable Outcome Label</label>
                   <input 
                     type="text" 
                     value={favorableLabel}
                     onChange={e => setFavorableLabel(e.target.value)}
                     placeholder="e.g. 1 or >50K"
-                    className="w-full bg-slate-50 dark:bg-black/50 border border-[var(--panel-border)] rounded-lg px-4 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[var(--primary)] transition-colors placeholder:text-slate-400"
+                    className="w-full bg-black/50 border border-[var(--panel-border)] rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--primary)] transition-colors"
                   />
-                  <p className="text-[10px] text-slate-500 dark:text-gray-500 mt-1">Specify which value in the target variable corresponds to the "favorable" (positive) outcome.</p>
+                  <p className="text-[10px] text-gray-500 mt-1">Specify which value in the target variable corresponds to the "favorable" (positive) outcome.</p>
                 </div>
 
                 {/* Sensitive Attributes */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-gray-200 mb-3">Sensitive Attributes</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-3">Sensitive Attributes</label>
                   <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar">
                     {columns.filter(col => col.name !== targetColumn).map(col => {
                       const isSelected = selectedAttributes.includes(col.name);
@@ -291,7 +291,7 @@ export default function AuditPage() {
                             "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border",
                             isSelected 
                               ? "bg-[var(--primary)]/20 border-[var(--primary)] text-[var(--primary)] shadow-[0_0_10px_rgba(59,130,246,0.1)]" 
-                              : "bg-slate-50 dark:bg-black/30 border-[var(--panel-border)] text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-gray-500"
+                              : "bg-black/30 border-[var(--panel-border)] text-gray-400 hover:text-white hover:border-gray-500"
                           )}
                         >
                           {col.name}
@@ -304,8 +304,8 @@ export default function AuditPage() {
             )}
 
             <div className="mt-8 pt-6 border-t border-[var(--panel-border)] flex items-center justify-between">
-               <div className="text-sm text-slate-500 dark:text-gray-400">
-                 <span className="text-slate-900 dark:text-white font-semibold">{selectedAttributes.length}</span> attributes selected
+               <div className="text-sm text-gray-400">
+                 <span className="text-white font-semibold">{selectedAttributes.length}</span> attributes selected
                </div>
                <button 
                  onClick={handleStartAnalysis}

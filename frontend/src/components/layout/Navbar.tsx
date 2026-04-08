@@ -10,7 +10,6 @@ import {
 import { signIn, signOut, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -30,13 +29,13 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-[var(--panel-border)] bg-[var(--nav-bg)] backdrop-blur-xl flex items-center justify-between px-4 lg:px-12 transition-colors duration-300">
+      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-black/60 backdrop-blur-xl flex items-center justify-between px-4 lg:px-12">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="p-1.5 bg-[#3b82f6]/20 rounded-lg group-hover:bg-[#3b82f6]/30 transition-colors">
             <ShieldCheck className="w-5 h-5 text-[#3b82f6]" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+          <span className="text-lg font-bold tracking-tight text-white">
             FairAI <span className="text-[#3b82f6]">Studio</span>
           </span>
         </Link>
@@ -57,7 +56,7 @@ export default function Navbar() {
                   "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   isActive
                     ? "bg-[#3b82f6]/15 text-[#3b82f6] shadow-sm"
-                    : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -72,8 +71,6 @@ export default function Navbar() {
 
         {/* Desktop Right: CTA / Auth */}
         <div className="hidden md:flex items-center gap-3">
-          <ThemeToggle />
-          <div className="w-px h-6 bg-[var(--panel-border)] mx-1" />
           {session ? (
             <div className="flex items-center gap-3">
               {session.user?.image ? (
@@ -85,7 +82,7 @@ export default function Navbar() {
               )}
               <button
                 onClick={() => signOut()}
-                className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white px-2 py-1 flex items-center gap-2 text-sm transition-colors"
+                className="text-gray-400 hover:text-white px-2 py-1 flex items-center gap-2 text-sm transition-colors"
               >
                 <LogOut className="w-4 h-4" /> Sign Out
               </button>
@@ -111,16 +108,13 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Toggle Group */}
-        <div className="flex md:hidden items-center gap-2">
-          <ThemeToggle />
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+        {/* Mobile Menu Toggle */}
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+        >
+          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </nav>
 
       {/* Mobile Drawer */}
@@ -139,24 +133,24 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 z-[70] w-full max-w-[280px] bg-white dark:bg-[#0a0a0a] border-l border-[var(--panel-border)] p-6 flex flex-col md:hidden"
+              className="fixed inset-y-0 right-0 z-[70] w-full max-w-[280px] bg-[#0a0a0a] border-l border-white/5 p-6 flex flex-col md:hidden"
             >
               <div className="flex items-center justify-between mb-8">
-                <span className="text-xl font-bold text-slate-900 dark:text-white">Menu</span>
-                <button onClick={() => setIsMenuOpen(false)} className="text-slate-500 dark:text-gray-400"><X className="w-5 h-5" /></button>
+                <span className="text-xl font-bold text-white">Menu</span>
+                <button onClick={() => setIsMenuOpen(false)} className="text-gray-400"><X className="w-5 h-5" /></button>
               </div>
 
               {/* Profile in Menu */}
               {session && (
-                <div className="flex items-center gap-3 p-4 bg-slate-100 dark:bg-white/5 rounded-xl mb-6">
+                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl mb-6">
                   {session.user?.image ? (
-                    <img src={session.user.image} alt="Profile" className="w-10 h-10 rounded-full border border-slate-200 dark:border-white/10" />
+                    <img src={session.user.image} alt="Profile" className="w-10 h-10 rounded-full border border-white/10" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#3b82f6] flex items-center justify-center font-bold text-white">{session.user?.name?.[0]}</div>
+                    <div className="w-10 h-10 rounded-full bg-[#3b82f6] flex items-center justify-center font-bold">{session.user?.name?.[0]}</div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{session.user?.name}</p>
-                    <p className="text-[10px] text-slate-500 dark:text-gray-500 truncate">{session.user?.email}</p>
+                    <p className="text-sm font-medium text-white truncate">{session.user?.name}</p>
+                    <p className="text-[10px] text-gray-500 truncate">{session.user?.email}</p>
                   </div>
                 </div>
               )}
@@ -174,7 +168,7 @@ export default function Navbar() {
                       href={link.href}
                       className={clsx(
                         "flex items-center justify-between p-3 rounded-lg text-sm transition-colors",
-                        isActive ? "bg-[#3b82f6]/10 text-[#3b82f6]" : "text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                        isActive ? "bg-[#3b82f6]/10 text-[#3b82f6]" : "text-gray-400 hover:bg-white/5 hover:text-white"
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -188,7 +182,7 @@ export default function Navbar() {
               </div>
 
               {/* Auth Button */}
-              <div className="mt-auto pt-6 border-t border-[var(--panel-border)] flex flex-col gap-3">
+              <div className="mt-auto pt-6 border-t border-white/5 flex flex-col gap-3">
                 {session ? (
                   <>
                     <Link href="/audit" className="w-full bg-[#3b82f6] text-white p-3 rounded-lg text-sm font-medium text-center">
@@ -196,7 +190,7 @@ export default function Navbar() {
                     </Link>
                     <button 
                       onClick={() => signOut()}
-                      className="w-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 p-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+                      className="w-full bg-white/5 text-gray-400 p-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
                     >
                       <LogOut className="w-4 h-4" /> Sign Out
                     </button>
@@ -204,7 +198,7 @@ export default function Navbar() {
                 ) : (
                   <button 
                     onClick={() => signIn("google")}
-                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-black p-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+                    className="w-full bg-white text-black p-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <LogIn className="w-4 h-4" /> Sign in with Google
                   </button>

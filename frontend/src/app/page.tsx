@@ -63,8 +63,8 @@ function FeatureCard({ icon, title, description, delay, accent }: {
         {icon}
       </div>
       <div>
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-[#3b82f6] transition-colors">{title}</h3>
-        <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">{description}</p>
+        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#3b82f6] transition-colors">{title}</h3>
+        <p className="text-gray-400 leading-relaxed text-sm">{description}</p>
       </div>
     </motion.div>
   );
@@ -85,8 +85,8 @@ function StepCard({ step, title, desc, delay }: {
         {step}
       </div>
       <div>
-        <h4 className="text-slate-900 dark:text-white font-semibold text-sm mb-0.5">{title}</h4>
-        <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{desc}</p>
+        <h4 className="text-white font-semibold text-sm mb-0.5">{title}</h4>
+        <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
       </div>
     </motion.div>
   );
@@ -126,7 +126,7 @@ export default function Home() {
 
         <motion.p
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15 }}
-          className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10"
+          className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10"
         >
           Detect, analyze, and mitigate bias in your ML models and datasets.
           An intuitive platform for everyone to ensure trustworthy AI.
@@ -144,7 +144,7 @@ export default function Home() {
           </Link>
           <Link
             href="/reports"
-            className="inline-flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] text-slate-900 dark:text-white px-8 py-3.5 rounded-full font-medium text-base transition-all"
+            className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-[#262626] text-white px-8 py-3.5 rounded-full font-medium text-base transition-all"
           >
             <FileText className="w-4 h-4" /> View Past Reports
           </Link>
@@ -169,7 +169,7 @@ export default function Home() {
                   <p className={`text-3xl font-bold ${s.color}`}>
                     <Counter to={s.val} />
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{s.label}</p>
+                  <p className="text-xs text-gray-500">{s.label}</p>
                 </div>
               </div>
             ))}
@@ -181,8 +181,8 @@ export default function Home() {
       <section className="w-full max-w-6xl mx-auto px-6 mb-20">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">Everything you need to audit AI</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-3">Everything you need to audit AI</h2>
+          <p className="text-gray-500 text-sm max-w-xl mx-auto">
             A complete audit pipeline from data ingestion to actionable reports — no ML expertise required.
           </p>
         </motion.div>
@@ -216,8 +216,8 @@ export default function Home() {
         <div className="glass-panel p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-              className="text-2xl font-bold text-slate-900 dark:text-white mb-2">How it works</motion.h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">Four steps from raw data to fair AI.</p>
+              className="text-2xl font-bold text-white mb-2">How it works</motion.h2>
+            <p className="text-gray-500 text-sm mb-8">Four steps from raw data to fair AI.</p>
             <div className="space-y-6">
               <StepCard step="1" title="Upload Your Dataset" desc="Drag-and-drop a CSV or Excel file. Supports datasets up to 100k rows." delay={0.45} />
               <StepCard step="2" title="Configure the Audit" desc="Select your target label, favorable outcome, and which demographics to test." delay={0.5} />
@@ -230,11 +230,11 @@ export default function Home() {
             <div className="mt-8 glass-panel p-5 border-[#3b82f6]/20">
               <div className="flex items-center gap-2 mb-3">
                 <Brain className="w-4 h-4 text-[#8b5cf6]" />
-                <span className="text-sm font-medium text-slate-900 dark:text-white">Powered by real ML</span>
+                <span className="text-sm font-medium text-white">Powered by real ML</span>
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-gray-400 leading-relaxed">
                 FairAI Studio trains a RandomForest classifier on your data, then applies industry-standard
-                fairness auditing libraries to produce <strong className="text-slate-900 dark:text-white">audit-grade metrics</strong> used
+                fairness auditing libraries to produce <strong className="text-white">audit-grade metrics</strong> used
                 by compliance teams, researchers, and regulators worldwide.
               </p>
             </div>
@@ -249,8 +249,8 @@ export default function Home() {
           className="glass-panel p-8 md:p-12 text-center relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6]/5 to-[#8b5cf6]/5 pointer-events-none" />
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3 relative">Ready to audit your model?</h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 max-w-md mx-auto relative">
+          <h2 className="text-3xl font-bold text-white mb-3 relative">Ready to audit your model?</h2>
+          <p className="text-gray-400 text-sm mb-8 max-w-md mx-auto relative">
             Upload your dataset in seconds. No account required. Free and open source.
           </p>
           <Link
