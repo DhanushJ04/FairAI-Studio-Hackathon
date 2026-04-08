@@ -100,8 +100,8 @@ export default function ReportsPage() {
     <div className="flex-1 w-full max-w-6xl mx-auto px-6 py-8 flex flex-col pt-24 space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-bold text-white mb-2">Audit Reports</h1>
-        <p className="text-gray-400">History of all bias audits you have run on this platform.</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Audit Reports</h1>
+        <p className="text-slate-500 dark:text-slate-400">History of all bias audits you have run on this platform.</p>
       </motion.div>
 
       {/* Summary Stats */}
@@ -113,10 +113,10 @@ export default function ReportsPage() {
           { label: "Bias Flagged", value: biasedCount, icon: <AlertTriangle className="w-5 h-5 text-red-400" />, color: "text-red-400" },
         ].map((s, i) => (
           <div key={i} className="glass-panel p-5 flex items-center gap-4">
-            <div className="p-2.5 bg-white/5 rounded-xl">{s.icon}</div>
+            <div className="p-2.5 bg-slate-100 dark:bg-white/5 rounded-xl">{s.icon}</div>
             <div>
               <p className={clsx("text-2xl font-bold", s.color)}>{s.value}</p>
-              <p className="text-xs text-gray-400">{s.label}</p>
+              <p className="text-xs text-slate-500 dark:text-gray-400">{s.label}</p>
             </div>
           </div>
         ))}
@@ -125,18 +125,18 @@ export default function ReportsPage() {
       {/* Search + Refresh */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Search by filename, target, or attribute…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-[#262626] rounded-lg pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#3b82f6] transition-colors"
+            className="w-full bg-slate-100 dark:bg-white/5 border border-[var(--panel-border)] rounded-lg pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#3b82f6] transition-colors"
           />
         </div>
         <button
           onClick={fetchReports}
-          className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-[#262626] px-4 py-2.5 rounded-lg text-sm text-white transition-colors"
+          className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-700 dark:text-white transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           <span className="hidden sm:inline">Refresh</span>
@@ -153,7 +153,7 @@ export default function ReportsPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-[#3b82f6]" />
-          <p className="text-gray-400 text-sm">Loading reports…</p>
+          <p className="text-slate-500 dark:text-gray-400 text-sm">Loading reports…</p>
         </div>
       ) : error ? (
         <div className="glass-panel p-8 flex flex-col items-center justify-center gap-4 text-center">
@@ -163,11 +163,11 @@ export default function ReportsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-panel p-12 flex flex-col items-center justify-center gap-4 text-center">
-          <Database className="w-12 h-12 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-400">
+          <Database className="w-12 h-12 text-slate-300 dark:text-gray-600" />
+          <h2 className="text-lg font-semibold text-slate-400 dark:text-gray-400">
             {reports.length === 0 ? "No audit reports yet" : "No results found"}
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500 dark:text-gray-600">
             {reports.length === 0
               ? "Run your first bias audit to see results here."
               : "Try a different search term."}
@@ -215,7 +215,7 @@ export default function ReportsPage() {
                   {/* Main Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h3 className="font-semibold text-white truncate">{report.filename}</h3>
+                      <h3 className="font-semibold text-slate-900 dark:text-white truncate">{report.filename}</h3>
                       <span className={clsx(
                         "text-[10px] px-2 py-0.5 rounded-full border font-medium shrink-0",
                         isFair ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-red-500/15 text-red-400 border-red-500/30"
@@ -223,19 +223,19 @@ export default function ReportsPage() {
                         {isFair ? "Fair" : "Biased"} · {pct}%
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-                      <span>Target: <span className="text-gray-300">{report.target_column}</span></span>
-                      <span>Sensitive: <span className="text-gray-300">{(report.sensitive_attributes || []).join(", ")}</span></span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-gray-400">
+                      <span>Target: <span className="text-slate-700 dark:text-gray-300">{report.target_column}</span></span>
+                      <span>Sensitive: <span className="text-slate-700 dark:text-gray-300">{(report.sensitive_attributes || []).join(", ")}</span></span>
                     </div>
                       {/* Time removed as requested */}
                   </div>
 
                   {/* Score Bar */}
                   <div className="sm:w-28 shrink-0">
-                    <div className="flex justify-between text-[10px] text-gray-500 mb-1">
+                    <div className="flex justify-between text-[10px] text-slate-500 dark:text-gray-500 mb-1">
                       <span>Score</span><span>{pct}%</span>
                     </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
                         className="h-1.5 rounded-full transition-all"
                         style={{
@@ -251,7 +251,7 @@ export default function ReportsPage() {
                     <button
                       onClick={() => handleDownload(report)}
                       disabled={downloadingId === report.id}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                      className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
                       title="Download PDF"
                     >
                       {downloadingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -259,7 +259,7 @@ export default function ReportsPage() {
                     <button
                       onClick={() => handleDelete(report.id)}
                       disabled={deletingId === report.id}
-                      className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-50"
+                      className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-red-500/10 dark:hover:bg-red-500/20 text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50"
                       title="Delete Report"
                     >
                       {deletingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}

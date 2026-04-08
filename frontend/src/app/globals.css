@@ -18,12 +18,11 @@
 }
 
 :root {
-  /* Force Dark Mode Default */
-  --background: #050505;
-  --foreground: #f8fafc;
+  --background: #ffffff;
+  --foreground: #020617;
   
-  --panel: #111113;
-  --panel-border: #262626;
+  --panel: #ffffff;
+  --panel-border: #e2e8f0;
   
   --primary: #3b82f6; 
   --primary-hover: #2563eb;
@@ -32,6 +31,23 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   --accent: #8b5cf6;
+
+  --nav-bg: rgba(255, 255, 255, 0.7);
+  --panel-glass: rgba(255, 255, 255, 0.6);
+}
+
+.dark {
+  --background: #050505;
+  --foreground: #f8fafc;
+  
+  --panel: #111113;
+  --panel-border: #262626;
+  
+  --primary: #3b82f6; 
+  --primary-hover: #2563eb;
+
+  --nav-bg: rgba(5, 5, 5, 0.7);
+  --panel-glass: rgba(17, 17, 19, 0.7);
 }
 
 body {
@@ -43,7 +59,7 @@ body {
 
 /* Glassmorphism utilities */
 .glass-panel {
-  background: rgba(17, 17, 19, 0.7);
+  background: var(--panel-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--panel-border);
@@ -59,7 +75,7 @@ body {
   background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--panel-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
