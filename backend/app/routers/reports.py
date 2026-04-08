@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func, case
 from app.database import get_db
 from app.models import AuditReport, User
 from app.deps import get_current_active_user
@@ -13,13 +13,22 @@ router = APIRouter()
 
 @router.get("/reports")
 async def list_reports(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    """Returns a list of all completed audit reports."""
+    """Returns a list of all completed audit reports with only necessary columns."""
     result = await db.execute(
-        select(AuditReport)
+        select(
+            AuditReport.id,
+            AuditReport.filename,
+            AuditReport.target_column,
+            AuditReport.sensitive_attributes,
+            AuditReport.overall_fairness_score,
+            AuditReport.disparate_impact,
+            AuditReport.status,
+            AuditReport.created_at
+        )
         .where(AuditReport.status == "completed", AuditReport.user_id == current_user.id)
         .order_by(desc(AuditReport.created_at))
     )
-    reports = result.scalars().all()
+    reports = result.all()
     return [
         {
             "id": r.id,
@@ -33,6 +42,25 @@ async def list_reports(db: AsyncSession = Depends(get_db), current_user: User = 
         }
         for r in reports
     ]
+
+
+@router.get("/reports/stats")
+async def get_report_stats(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    """Returns summary statistics for the user's audit reports."""
+    result = await db.execute(
+        select(
+            func.count(AuditReport.id).label("total"),
+            func.sum(case((AuditReport.overall_fairness_score >= 0.7, 1), else_=0)).label("fair")
+        ).where(AuditReport.user_id == current_user.id, AuditReport.status == "completed")
+    )
+    stats = result.first()
+    total = stats.total or 0
+    fair = stats.fair or 0
+    return {
+        "total": total,
+        "fair": int(fair),
+        "biased": total - int(fair)
+    }
 
 
 @router.delete("/reports/{report_id}")

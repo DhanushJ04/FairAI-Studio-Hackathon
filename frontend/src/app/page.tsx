@@ -15,10 +15,8 @@ interface Stats { total: number; fair: number; biased: number; }
 function useLiveStats(): Stats {
   const [stats, setStats] = useState<Stats>({ total: 0, fair: 0, biased: 0 });
   useEffect(() => {
-    api.get("/reports").then((r) => {
-      const reports = r.data as any[];
-      const fair = reports.filter((x) => (x.overall_fairness_score ?? 0) >= 0.7).length;
-      setStats({ total: reports.length, fair, biased: reports.length - fair });
+    api.get("/reports/stats").then((r) => {
+      setStats(r.data);
     }).catch(() => {});
   }, []);
   return stats;

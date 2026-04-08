@@ -65,6 +65,6 @@ class AuditReport(Base):
     mitigation_json = Column(JSON, nullable=True)
     feature_importance_json = Column(JSON, nullable=True)
 
-    status = Column(String(50), default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String(50), default="pending", index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     completed_at = Column(DateTime, nullable=True)
