@@ -44,16 +44,11 @@ export default function Footer() {
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Support & Queries:
                 </p>
-                <a 
-                  href="https://formspree.io/f/xeepdloy" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group"
-                >
+                <a href="mailto:fairaistudio.support@gmail.com" className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group">
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
-                    <FileText className="w-4 h-4" />
+                    <Mail className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-medium">Open Support Ticket</span>
+                  <span className="text-sm font-medium">fairaistudio.support@gmail.com</span>
                 </a>
               </div>
             </div>
