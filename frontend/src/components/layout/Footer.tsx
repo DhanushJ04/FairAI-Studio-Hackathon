@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Scale, Mail, ShieldCheck } from "lucide-react";
+import { Scale, Mail, ShieldCheck, FileText } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -33,7 +33,7 @@ export default function Footer() {
                   For Business Inquiry:
                 </p>
                 <a href="mailto:fairaistudio@gmail.com" className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group">
-                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all">
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium">fairaistudio@gmail.com</span>
@@ -44,11 +44,16 @@ export default function Footer() {
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Support & Queries:
                 </p>
-                <a href="mailto:fairaistudio@gmail.com" className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group">
-                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all">
-                    <Mail className="w-4 h-4" />
+                <a 
+                  href="https://formspree.io/f/xeepdloy" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-gray-300 hover:text-[#3b82f6] transition-colors group"
+                >
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
+                    <FileText className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-medium">fairaistudio@gmail.com</span>
+                  <span className="text-sm font-medium">Open Support Ticket</span>
                 </a>
               </div>
             </div>
@@ -62,9 +67,9 @@ export default function Footer() {
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
                 Safety Audit
               </Link></li>
-              <li><Link href="/results" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
+              <li><Link href="/reports" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
-                Audit Results
+                Audit Reports
               </Link></li>
               <li><Link href="/reports" className="text-gray-500 hover:text-[#3b82f6] text-sm transition-colors flex items-center gap-2 group">
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-800 group-hover:bg-[#3b82f6] transition-colors" />
@@ -77,11 +82,15 @@ export default function Footer() {
           <div className="col-span-1">
             <h4 className="text-white font-semibold mb-6 text-sm">Legal & Safety</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Terms of Service</Link></li>
-              <li className="pt-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-wider">
+              <li><Link href="/privacy-policy" className="text-gray-500 hover:text-white text-sm transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms-of-service" className="text-gray-500 hover:text-white text-sm transition-colors">Terms of Service</Link></li>
+              <li className="pt-2 group/tip relative">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-wider cursor-help transition-all hover:bg-emerald-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" /> Secure Platform
+                </div>
+                {/* Tooltip */}
+                <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-[#1a1a1a] border border-white/10 rounded-lg text-[10px] text-gray-400 opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none shadow-xl">
+                  All file uploads are processed in-memory and never stored permanently.
                 </div>
               </li>
             </ul>
@@ -94,7 +103,7 @@ export default function Footer() {
             &copy; {currentYear} FairAI Studio. Built for Ethical AI Enforcement.
           </p>
           <div className="flex items-center gap-6 text-[10px] font-bold tracking-[0.1em]">
-            <span className="flex items-center gap-2 text-emerald-500/80">
+            <span className="flex items-center gap-2 text-emerald-500/60 hover:text-emerald-400 transition-colors">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               SYSTEM STATUS: NOMINAL
             </span>
