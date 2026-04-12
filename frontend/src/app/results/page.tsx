@@ -115,19 +115,19 @@ function MetricCard({ metric }: { metric: Metric }) {
     >
       <div className={`absolute top-0 left-0 w-1 h-full ${isBiased ? "bg-red-500" : "bg-emerald-500"}`} />
       <div className="flex items-start justify-between pl-2">
-        <p className="text-xs text-slate-500 dark:text-gray-400 leading-snug max-w-[75%]">{metric.name}</p>
+        <p className="text-xs text-slate-600 dark:text-gray-400 leading-snug max-w-[75%]">{metric.name}</p>
         <span className={clsx(
           "text-[10px] px-2 py-0.5 rounded-full font-semibold border shrink-0",
-          isBiased ? "bg-red-500/15 text-red-500 dark:text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+          isBiased ? "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30" : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
         )}>
           {isBiased ? "BIASED" : "FAIR"}
         </span>
       </div>
       <div className="flex items-end gap-2 pl-2">
-        <span className={clsx("text-2xl font-bold", isBiased ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")}>{displayVal}</span>
+        <span className={clsx("text-2xl font-bold", isBiased ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")}>{displayVal}</span>
         <span className="text-[10px] text-slate-500 dark:text-gray-500 mb-1">threshold: {isDI ? "≥" : "|x|≤"}{metric.threshold}</span>
       </div>
-      <p className="text-[10px] text-slate-500 dark:text-gray-500 pl-2 leading-relaxed">{metric.description}</p>
+      <p className="text-[10px] text-slate-600 dark:text-gray-500 pl-2 leading-relaxed">{metric.description}</p>
     </motion.div>
   );
 }
@@ -267,19 +267,19 @@ function MitigationCard({ m }: { m: Mitigation }) {
   const catCls = categoryColor[m.category] || "text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-500/30 bg-slate-100 dark:bg-gray-500/10";
   return (
     <div className="glass-panel p-5 hover:border-[#3b82f6]/40 transition-colors">
-      <div className="flex items-start justify-between gap-4 mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-3">
         <h3 className="font-semibold text-slate-900 dark:text-white text-sm">{m.name}</h3>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${catCls}`}>{m.category}</span>
           {m.recommended && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium">★ Recommended</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full border border-blue-300 dark:border-blue-500/30 bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-medium">★ Recommended</span>
           )}
         </div>
       </div>
-      <p className="text-xs text-slate-500 dark:text-gray-400 leading-relaxed mb-3">{m.description}</p>
+      <p className="text-xs text-slate-600 dark:text-gray-400 leading-relaxed mb-3">{m.description}</p>
       <div className="flex items-center gap-2">
         <div className={`w-2 h-2 rounded-full ${severityDot[m.severity] || "bg-gray-500"}`} />
-        <span className="text-[10px] text-slate-400 dark:text-gray-500 capitalize">{m.severity} severity</span>
+        <span className="text-[10px] text-slate-500 dark:text-gray-500 capitalize">{m.severity} severity</span>
       </div>
     </div>
   );
@@ -444,12 +444,12 @@ function ResultsContent() {
             <div className="md:col-span-2 glass-panel p-6 relative overflow-hidden">
               <div className={`absolute top-0 left-0 w-1 h-full ${biasedMetrics.length > 0 ? "bg-red-500" : "bg-emerald-500"}`} />
               <SectionHeader
-                icon={biasedMetrics.length > 0 ? <AlertTriangle className="w-5 h-5 text-red-400" /> : <CheckCircle className="w-5 h-5 text-emerald-400" />}
+              icon={biasedMetrics.length > 0 ? <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400" /> : <CheckCircle className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
                 title={biasedMetrics.length > 0 ? "Critical Bias Detected" : "All Metrics Pass"}
                 subtitle={biasedMetrics.length > 0 ? "The following metrics exceeded fairness thresholds:" : "No statistically significant bias found beyond defined thresholds."}
               />
               {biasedMetrics.length === 0 ? (
-                <p className="text-sm text-emerald-600 dark:text-emerald-200 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+                <p className="text-sm text-emerald-700 dark:text-emerald-200 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
                   No major biases detected. Continue monitoring model predictions over time for drift.
                 </p>
               ) : (
@@ -482,7 +482,7 @@ function ResultsContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="glass-panel p-6">
               <SectionHeader
-                icon={<TrendingDown className="w-5 h-5 text-amber-400" />}
+                icon={<TrendingDown className="w-5 h-5 text-amber-500 dark:text-amber-400" />}
                 title="Disparate Impact"
                 subtitle="Ratio ≥ 0.8 is considered fair (80% rule)"
               />
@@ -567,7 +567,7 @@ function ResultsContent() {
           {limeInstances.length > 0 && (
             <div className="glass-panel p-6">
               <SectionHeader
-                icon={<Lightbulb className="w-5 h-5 text-amber-400" />}
+                icon={<Lightbulb className="w-5 h-5 text-amber-500 dark:text-amber-400" />}
                 title="LIME Local Explanations"
                 subtitle="Feature contributions for individual sampled predictions — click to expand"
               />
@@ -584,7 +584,7 @@ function ResultsContent() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <div className="glass-panel p-6">
             <SectionHeader
-              icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
+              icon={<ShieldCheck className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
               title="Recommended Mitigation Strategies"
               subtitle="Actionable steps to reduce detected bias in your model or dataset"
             />
@@ -599,17 +599,17 @@ function ResultsContent() {
 
           <div className="glass-panel p-6 border-[#3b82f6]/20">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Mitigation Strategy Guide</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-500 dark:text-gray-400">
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
-                <p className="text-amber-500 dark:text-amber-400 font-semibold mb-2">Pre-processing</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600 dark:text-gray-400">
+              <div className="bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 rounded-lg p-4">
+                <p className="text-amber-600 dark:text-amber-400 font-semibold mb-2">Pre-processing</p>
                 <p>Applied to training data before model training. Techniques: Reweighing, Disparate Impact Remover, Sampling strategies.</p>
               </div>
-              <div className="bg-purple-500/5 border border-purple-500/20 rounded-lg p-4">
-                <p className="text-purple-500 dark:text-purple-400 font-semibold mb-2">Post-processing</p>
+              <div className="bg-purple-500/10 dark:bg-purple-500/5 border border-purple-500/30 dark:border-purple-500/20 rounded-lg p-4">
+                <p className="text-purple-600 dark:text-purple-400 font-semibold mb-2">Post-processing</p>
                 <p>Applied to model predictions after training. Techniques: Calibrated Equalized Odds, Reject Option Classification.</p>
               </div>
-              <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-4">
-                <p className="text-blue-500 dark:text-blue-400 font-semibold mb-2">In-processing</p>
+              <div className="bg-blue-500/10 dark:bg-blue-500/5 border border-blue-500/30 dark:border-blue-500/20 rounded-lg p-4">
+                <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">In-processing</p>
                 <p>Constraints applied during model training. Techniques: Prejudice Remover, Adversarial Debiasing, Fairness constraints.</p>
               </div>
             </div>

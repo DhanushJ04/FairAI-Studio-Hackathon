@@ -108,9 +108,9 @@ export default function ReportsPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Total Reports", value: reports.length, icon: <FileText className="w-5 h-5 text-[#3b82f6]" />, color: "text-[#3b82f6]" },
-          { label: "Fair Results", value: fairCount, icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, color: "text-emerald-400" },
-          { label: "Bias Flagged", value: biasedCount, icon: <AlertTriangle className="w-5 h-5 text-red-400" />, color: "text-red-400" },
+          { label: "Total Reports", value: reports.length, icon: <FileText className="w-5 h-5 text-blue-500 dark:text-[#3b82f6]" />, color: "text-blue-600 dark:text-[#3b82f6]" },
+          { label: "Fair Results", value: fairCount, icon: <CheckCircle className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />, color: "text-emerald-600 dark:text-emerald-400" },
+          { label: "Bias Flagged", value: biasedCount, icon: <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400" />, color: "text-red-600 dark:text-red-400" },
         ].map((s, i) => (
           <div key={i} className="glass-panel p-5 flex items-center gap-4">
             <div className="p-2.5 bg-slate-100 dark:bg-white/5 rounded-xl">{s.icon}</div>
@@ -125,7 +125,7 @@ export default function ReportsPage() {
       {/* Search + Refresh */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 overflow-hidden">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Search audits..."
@@ -159,14 +159,14 @@ export default function ReportsPage() {
         </div>
       ) : error ? (
         <div className="glass-panel p-8 flex flex-col items-center justify-center gap-4 text-center">
-          <AlertTriangle className="w-10 h-10 text-red-400" />
-          <p className="text-red-400">{error}</p>
+          <AlertTriangle className="w-10 h-10 text-red-500 dark:text-red-400" />
+          <p className="text-red-600 dark:text-red-400">{error}</p>
           <button onClick={fetchReports} className="text-sm text-[#3b82f6] hover:underline">Try again</button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-panel p-12 flex flex-col items-center justify-center gap-4 text-center">
-          <Database className="w-12 h-12 text-slate-300 dark:text-gray-600" />
-          <h2 className="text-lg font-semibold text-slate-400 dark:text-gray-400">
+          <Database className="w-12 h-12 text-slate-400 dark:text-gray-600" />
+          <h2 className="text-lg font-semibold text-slate-600 dark:text-gray-400">
             {reports.length === 0 ? "No audit reports yet" : "No results found"}
           </h2>
           <p className="text-sm text-slate-500 dark:text-gray-600">
@@ -209,8 +209,8 @@ export default function ReportsPage() {
                     isFair ? "bg-emerald-500/10" : "bg-red-500/10"
                   )}>
                     {isFair
-                      ? <CheckCircle className="w-6 h-6 text-emerald-400" />
-                      : <AlertTriangle className="w-6 h-6 text-red-400" />
+                      ? <CheckCircle className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
+                      : <AlertTriangle className="w-6 h-6 text-red-500 dark:text-red-400" />
                     }
                   </div>
 
@@ -222,7 +222,7 @@ export default function ReportsPage() {
                           <h3 className="font-semibold text-slate-900 dark:text-white truncate text-base">{report.filename}</h3>
                           <span className={clsx(
                             "text-[10px] px-2 py-0.5 rounded-full border font-medium shrink-0",
-                            isFair ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-red-500/15 text-red-400 border-red-500/30"
+                            isFair ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" : "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30"
                           )}>
                             {isFair ? "Fair" : "Biased"} · {pct}%
                           </span>
