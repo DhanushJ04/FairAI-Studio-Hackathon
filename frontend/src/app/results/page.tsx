@@ -7,14 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertTriangle, Download, Info, CheckCircle, ArrowRight, ShieldCheck,
   Loader2, TrendingDown, TrendingUp, Users, BarChart2, Brain, Lightbulb,
-  ChevronDown, ChevronUp, ArrowLeft
+  ChevronDown, ChevronUp, ArrowLeft, Clock, Database
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, ReferenceLine, Cell, RadarChart, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, Radar, Legend
 } from "recharts";
-import api, { baseURL } from "@/lib/api";
+import api from "@/lib/api";
 import clsx from "clsx";
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -42,17 +42,6 @@ const COLORS = {
   panel: "#111113",
 };
 
-function TooltipIcon({ text }: { text: string }) {
-  return (
-    <div className="relative group flex items-center justify-center">
-      <Info className="w-4 h-4 text-gray-500 hover:text-white transition-colors cursor-help" />
-      <div className="absolute bottom-full mb-2 hidden group-hover:block w-52 p-2 bg-black/95 border border-[#262626] text-xs text-gray-200 rounded-lg shadow-xl z-50 pointer-events-none leading-relaxed">
-        {text}
-      </div>
-    </div>
-  );
-}
-
 function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
   return (
     <div className="flex items-start gap-3 mb-6">
@@ -66,14 +55,14 @@ function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title
 }
 
 /* ─── Score Gauge ────────────────────────────────────────────── */
-function ScoreGauge({ score }: { score: number }) {
+function ScoreGauge({ score, size = 180 }: { score: number; size?: number }) {
   const pct = Math.round(score * 100);
   const isFair = pct >= 70;
   const isWarning = pct >= 50 && pct < 70;
   const color = isFair ? COLORS.fair : isWarning ? COLORS.warning : COLORS.biased;
   const label = isFair ? "Fair" : isWarning ? "Caution" : "High Risk";
 
-  // SVG arc parameters
+  const viewBoxSize = 180;
   const r = 70, cx = 90, cy = 90;
   const startAngle = -210, endAngle = 30;
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -88,24 +77,24 @@ function ScoreGauge({ score }: { score: number }) {
   const largeArc = (endAngle - startAngle) * (pct / 100) > 180 ? 1 : 0;
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width="180" height="130" viewBox="0 0 180 130">
-        {/* Track */}
+    <div className="flex flex-col items-center select-none">
+      <svg width={size} height={size * 0.72} viewBox={`0 0 ${viewBoxSize} 130`}>
         <path
           d={`M ${s.x} ${s.y} A ${r} ${r} 0 1 1 ${e.x} ${e.y}`}
           fill="none" stroke="#1f1f23" strokeWidth="12" strokeLinecap="round"
         />
-        {/* Fill */}
-        <path
+        <motion.path
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
           d={`M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} 1 ${ef.x} ${ef.y}`}
           fill="none" stroke={color} strokeWidth="12" strokeLinecap="round"
           style={{ filter: `drop-shadow(0 0 8px ${color}80)` }}
         />
-        {/* Score text */}
-        <text x="90" y="88" textAnchor="middle" fill="white" fontSize="28" fontWeight="bold">{pct}%</text>
+        <text x="90" y="88" textAnchor="middle" fill="currentColor" className="text-slate-900 dark:text-white" fontSize="28" fontWeight="bold">{pct}%</text>
         <text x="90" y="108" textAnchor="middle" fill={color} fontSize="13" fontWeight="600">{label}</text>
       </svg>
-      <p className="text-xs text-gray-500 mt-1">Baseline Model Accuracy</p>
+      <p className="text-[10px] text-slate-500 dark:text-gray-500 uppercase tracking-tight mt-1">Accuracy & Fairness</p>
     </div>
   );
 }
@@ -114,7 +103,6 @@ function ScoreGauge({ score }: { score: number }) {
 function MetricCard({ metric }: { metric: Metric }) {
   const isBiased = metric.status === "biased";
   const isDI = metric.name.includes("Disparate Impact");
-  // For DI, biased if < 0.8. For others, biased if |value| > threshold
   const displayVal = isDI ? metric.value.toFixed(3) : (metric.value >= 0 ? "+" : "") + metric.value.toFixed(3);
 
   return (
@@ -146,15 +134,13 @@ function MetricCard({ metric }: { metric: Metric }) {
 
 /* ─── Fairness Radar ─────────────────────────────────────────── */
 function FairnessRadar({ metrics, isDark }: { metrics: Metric[]; isDark: boolean }) {
-  // Normalize metrics to 0-1 scale for radar (1 = perfectly fair)
   const radarData = metrics.map((m) => {
     let fairness: number;
     if (m.name.includes("Disparate Impact")) {
-      fairness = Math.min(m.value / 1.0, 1); // 1.0 is perfect
+      fairness = Math.min(m.value / 1.0, 1);
     } else {
-      fairness = Math.max(0, 1 - Math.abs(m.value) / 0.5); // 0 diff = 1.0
+      fairness = Math.max(0, 1 - Math.abs(m.value) / 0.5);
     }
-    // Short label
     const label = m.name
       .replace("Disparate Impact", "Disp. Impact")
       .replace("Statistical Parity Difference", "Stat. Parity")
@@ -179,8 +165,9 @@ function FairnessRadar({ metrics, isDark }: { metrics: Metric[]; isDark: boolean
         </RadarChart>
       </ResponsiveContainer>
     </div>
+  );
 }
- 
+
 /* ─── Group Comparison Chart ─────────────────────────────────── */
 function GroupComparisonChart({ groupMetrics, isDark }: { groupMetrics: GroupMetric[]; isDark: boolean }) {
   const chartData = useMemo(() => groupMetrics.map((g) => ({
@@ -201,7 +188,7 @@ function GroupComparisonChart({ groupMetrics, isDark }: { groupMetrics: GroupMet
             cursor={{ fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}
             contentStyle={{ backgroundColor: isDark ? "#111113" : "#fff", borderColor: isDark ? "#262626" : "#e2e8f0", borderRadius: "8px", color: isDark ? "#fff" : "#0f172a", fontSize: "12px" }}
           />
-          <Legend wrapperStyle={{ fontSize: "11px", pt: 20 }} />
+          <Legend wrapperStyle={{ fontSize: "11px", paddingTop: 20 }} />
           <Bar dataKey="Positive Rate" fill={COLORS.primary} radius={[3, 3, 0, 0]} maxBarSize={30} />
           <Bar dataKey="True Pos. Rate" fill={COLORS.fair} radius={[3, 3, 0, 0]} maxBarSize={30} />
           <Bar dataKey="False Pos. Rate" fill={COLORS.biased} radius={[3, 3, 0, 0]} maxBarSize={30} />
@@ -219,38 +206,43 @@ function LimeCard({ instance }: { instance: LimeInstance }) {
     <div className="bg-slate-50 dark:bg-white/5 rounded-lg border border-[var(--panel-border)] overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-left"
       >
-        <span className="font-medium">
-          Instance #{instance.instance_index + 1} — Predicted:{" "}
-          <span className={instance.prediction === 1 ? "text-emerald-500" : "text-red-500"}>
-            Class {instance.prediction}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+          <span className="font-semibold">Instance #{instance.instance_index + 1}</span>
+          <span className="hidden sm:inline text-slate-400">—</span>
+          <span>
+            Predicted: <span className={instance.prediction === 1 ? "text-emerald-500" : "text-red-500"}>Class {instance.prediction}</span>
           </span>
-        </span>
+        </div>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400 dark:text-gray-400" /> : <ChevronDown className="w-4 h-4 text-slate-400 dark:text-gray-400" />}
       </button>
       <AnimatePresence>
         {open && (
-            <motion.div
+          <motion.div
             initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }} className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-2">
+            <div className="px-4 pb-4 space-y-3 pt-2">
               {instance.features.map((f, i) => {
                 const pct = (Math.abs(f.weight) / maxW) * 100;
                 const pos = f.weight > 0;
                 return (
-                  <div key={i} className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 w-36 shrink-0 truncate">{f.feature}</span>
-                    <div className="flex-1 bg-slate-200 dark:bg-[#1a1a1a] rounded-full h-2 overflow-hidden">
-                      <div
-                        className="h-2 rounded-full transition-all"
-                        style={{ width: `${pct}%`, backgroundColor: pos ? COLORS.fair : COLORS.biased }}
-                      />
+                  <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <span className="text-[10px] text-slate-500 dark:text-gray-400 sm:w-36 shrink-0 truncate sm:mb-0" title={f.feature}>{f.feature}</span>
+                    <div className="flex flex-1 items-center gap-2">
+                      <div className="flex-1 bg-slate-200 dark:bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          className="h-1.5 rounded-full transition-all"
+                          style={{ backgroundColor: pos ? COLORS.fair : COLORS.biased }}
+                        />
+                      </div>
+                      <span className={clsx("text-[10px] font-mono w-14 text-right shrink-0", pos ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
+                        {f.weight >= 0 ? "+" : ""}{f.weight.toFixed(3)}
+                      </span>
                     </div>
-                    <span className={clsx("text-[10px] font-mono w-14 text-right", pos ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
-                      {f.weight >= 0 ? "+" : ""}{f.weight.toFixed(3)}
-                    </span>
                   </div>
                 );
               })}
@@ -298,6 +290,7 @@ function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const reportId = searchParams.get("reportId");
+  const { resolvedTheme } = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -322,8 +315,8 @@ function ResultsContent() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center pt-32">
         <Loader2 className="w-12 h-12 text-[#3b82f6] animate-spin mb-4" />
-        <h2 className="text-xl text-white font-medium">Crunching Bias Metrics…</h2>
-        <p className="text-sm text-gray-500 mt-1">Running SHAP, LIME, and fairness analysis.</p>
+        <h2 className="text-xl text-slate-900 dark:text-white font-medium">Crunching Bias Metrics…</h2>
+        <p className="text-sm text-slate-500 dark:text-gray-500 mt-1">Running SHAP, LIME, and fairness analysis.</p>
       </div>
     );
   }
@@ -332,7 +325,7 @@ function ResultsContent() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center pt-32 text-center px-4">
         <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-xl text-red-400 font-medium mb-2">{errorMSG || "Data missing"}</h2>
+        <h2 className="text-xl text-red-500 dark:text-red-400 font-medium mb-2">{errorMSG || "Data missing"}</h2>
         <button onClick={() => router.push("/audit")} className="mt-4 text-sm text-[#3b82f6] hover:underline flex items-center gap-1">
           <ArrowLeft className="w-4 h-4" /> Run a new audit
         </button>
@@ -357,12 +350,36 @@ function ResultsContent() {
 
   const handleDownload = async () => {
     try {
-      set      {/* ── Header ── */}
+      setDownloading(true);
+      const res = await api.get(`/generate-report/${reportId}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `AI_Bias_Audit_${reportId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download report.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const TABS = [
+    { id: "overview", label: "Overview" },
+    { id: "explainability", label: "Model Explainability" },
+    { id: "mitigation", label: "Mitigation Strategies" },
+  ];
+
+  return (
+    <div className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col pt-24 space-y-8">
+      {/* ── Header ── */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--panel-border)] pb-6">
-        <div>
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--panel-border)] pb-6 lowercase">
+        <div className="capitalize-first">
           <div className="flex items-center gap-2 mb-1">
-            <button onClick={() => router.push("/audit")} className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <button onClick={() => router.push("/reports")} className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <span className="text-xs text-slate-500 dark:text-gray-500">Bias Audit Report</span>
@@ -370,7 +387,7 @@ function ResultsContent() {
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3 flex-wrap">
             {data.filename}
             <span className={clsx(
-              "text-sm px-3 py-1 rounded-full font-medium border",
+              "text-xs px-3 py-1 rounded-full font-medium border",
               overallFair ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30"
             )}>
               {overallFair ? "✓ Fair & Balanced" : `⚠ ${biasedMetrics.length} Bias Alert${biasedMetrics.length > 1 ? "s" : ""}`}
@@ -384,7 +401,7 @@ function ResultsContent() {
         <button
           onClick={handleDownload}
           disabled={downloading}
-          className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white transition-colors whitespace-nowrap disabled:opacity-50"
+          className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white transition-colors whitespace-nowrap disabled:opacity-50"
         >
           {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           {downloading ? "Generating..." : "Download PDF Report"}
@@ -403,49 +420,27 @@ function ResultsContent() {
             )}
           >{tab.label}</button>
         ))}
-      </div>ansition-colors whitespace-nowrap disabled:opacity-50"
-        >
-          {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          {downloading ? "Generating..." : "Download PDF Report"}
-        </button>
-      </motion.div>
-
-      {/* ── Tab Navigation ── */}
-      <div className="flex gap-1 bg-white/5 rounded-xl p-1 w-full md:w-fit overflow-x-auto custom-scrollbar">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={clsx(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
-              activeTab === tab.id ? "bg-[#3b82f6] text-white shadow" : "text-gray-400 hover:text-white"
-            )}
-          >{tab.label}</button>
-        ))}
       </div>
 
       {/* ═══════════ OVERVIEW TAB ═══════════ */}
       {activeTab === "overview" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          {/* Top row: Gauge + Alerts */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Fairness Score Gauge */}
             <div className="glass-panel p-6 flex flex-col items-center justify-center">
-              <p className="text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-4">Overall Fairness Score</p>
-              <ScoreGauge score={data.overall_score} theme={resolvedTheme || "dark"} />
+              <p className="text-[10px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-4">Overall Score</p>
+              <ScoreGauge score={data.overall_score} size={150} />
               <div className="mt-3 grid grid-cols-2 gap-3 w-full text-center">
-                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2">
+                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2 border border-slate-100 dark:border-white/5">
                   <p className="text-lg font-bold text-slate-900 dark:text-white">{metrics.filter(m => m.status === "fair").length}</p>
-                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Fair Metrics</p>
+                  <p className="text-[9px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Fair</p>
                 </div>
-                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2">
+                <div className="bg-slate-50 dark:bg-white/5 rounded-lg py-2 border border-slate-100 dark:border-white/5">
                   <p className="text-lg font-bold text-slate-900 dark:text-white">{biasedMetrics.length}</p>
-                  <p className="text-[10px] text-red-600 dark:text-red-400">Bias Alerts</p>
+                  <p className="text-[9px] uppercase tracking-wider text-red-600 dark:text-red-400">Bias</p>
                 </div>
               </div>
             </div>
 
-            {/* Alerts Panel */}
             <div className="md:col-span-2 glass-panel p-6 relative overflow-hidden">
               <div className={`absolute top-0 left-0 w-1 h-full ${biasedMetrics.length > 0 ? "bg-red-500" : "bg-emerald-500"}`} />
               <SectionHeader
@@ -454,26 +449,25 @@ function ResultsContent() {
                 subtitle={biasedMetrics.length > 0 ? "The following metrics exceeded fairness thresholds:" : "No statistically significant bias found beyond defined thresholds."}
               />
               {biasedMetrics.length === 0 ? (
-                <p className="text-sm text-emerald-200 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+                <p className="text-sm text-emerald-600 dark:text-emerald-200 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
                   No major biases detected. Continue monitoring model predictions over time for drift.
                 </p>
               ) : (
                 <ul className="space-y-2">
                   {biasedMetrics.slice(0, 5).map((m, i) => (
                     <li key={i} className="bg-red-500/10 p-3 rounded-lg border border-red-500/20 text-sm">
-                      <strong className="block text-red-400 mb-0.5">{m.name}</strong>
-                      <span className="text-red-200/80 text-xs">Value: {m.value.toFixed(4)} · Threshold: {m.threshold} · {m.description}</span>
+                      <strong className="block text-red-500 dark:text-red-400 mb-0.5">{m.name}</strong>
+                      <span className="text-red-700 dark:text-red-200/80 text-xs">Value: {m.value.toFixed(4)} · Threshold: {m.threshold} · {m.description}</span>
                     </li>
                   ))}
                   {biasedMetrics.length > 5 && (
-                    <li className="text-xs text-gray-500 pl-1">…and {biasedMetrics.length - 5} more</li>
+                    <li className="text-xs text-slate-500 dark:text-gray-500 pl-1">…and {biasedMetrics.length - 5} more</li>
                   )}
                 </ul>
               )}
             </div>
           </div>
 
-          {/* Metrics Grid */}
           <div className="glass-panel p-6">
             <SectionHeader
               icon={<BarChart2 className="w-5 h-5 text-[#3b82f6]" />}
@@ -485,9 +479,7 @@ function ResultsContent() {
             </div>
           </div>
 
-          {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Disparate Impact Bar + Radar */}
             <div className="glass-panel p-6">
               <SectionHeader
                 icon={<TrendingDown className="w-5 h-5 text-amber-400" />}
@@ -498,11 +490,11 @@ function ResultsContent() {
                 <div className="h-[220px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={disparateImpacts} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1f1f23" vertical={false} />
-                      <XAxis dataKey="name" stroke="#555" fontSize={11} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#555" fontSize={11} tickLine={false} axisLine={false} domain={[0, 1.2]} />
-                      <RechartsTooltip cursor={{ fill: "rgba(255,255,255,0.03)" }}
-                        contentStyle={{ backgroundColor: "#111113", borderColor: "#262626", borderRadius: "8px", color: "#fff", fontSize: "12px" }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={resolvedTheme === 'dark' ? "#1f1f23" : "#f1f5f9"} vertical={false} />
+                      <XAxis dataKey="name" stroke={resolvedTheme === 'dark' ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} />
+                      <YAxis stroke={resolvedTheme === 'dark' ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} domain={[0, 1.2]} />
+                      <RechartsTooltip cursor={{ fill: resolvedTheme === 'dark' ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}
+                        contentStyle={{ backgroundColor: resolvedTheme === 'dark' ? "#111113" : "#fff", borderColor: resolvedTheme === 'dark' ? "#262626" : "#e2e8f0", borderRadius: "8px", color: resolvedTheme === 'dark' ? "#fff" : "#0f172a", fontSize: "12px" }} />
                       <ReferenceLine y={0.8} stroke="#ef4444" strokeDasharray="4 4"
                         label={{ position: "insideTopRight", value: "0.8 min", fill: "#ef4444", fontSize: 10 }} />
                       <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={70}>
@@ -513,21 +505,19 @@ function ResultsContent() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              ) : <p className="text-sm text-gray-500">No Disparate Impact metrics computed.</p>}
+              ) : <p className="text-sm text-slate-500 dark:text-gray-500">No Disparate Impact metrics computed.</p>}
             </div>
 
-            {/* Fairness Radar */}
             <div className="glass-panel p-6">
               <SectionHeader
                 icon={<TrendingUp className="w-5 h-5 text-[#8b5cf6]" />}
                 title="Fairness Radar"
                 subtitle="Higher score = more fair (normalized 0–100)"
               />
-              {metrics.length > 0 ? <FairnessRadar metrics={metrics} /> : <p className="text-sm text-gray-500">No metrics available.</p>}
+              {metrics.length > 0 ? <FairnessRadar metrics={metrics} isDark={resolvedTheme === 'dark'} /> : <p className="text-sm text-slate-500 dark:text-gray-500">No metrics available.</p>}
             </div>
           </div>
 
-          {/* Group Comparison */}
           {groupMetrics.length > 0 && (
             <div className="glass-panel p-6">
               <SectionHeader
@@ -535,7 +525,7 @@ function ResultsContent() {
                 title="Group Comparison"
                 subtitle="Outcome rates broken down by demographic group"
               />
-              <GroupComparisonChart groupMetrics={groupMetrics} />
+              <GroupComparisonChart groupMetrics={groupMetrics} isDark={resolvedTheme === 'dark'} />
             </div>
           )}
         </motion.div>
@@ -544,7 +534,6 @@ function ResultsContent() {
       {/* ═══════════ EXPLAINABILITY TAB ═══════════ */}
       {activeTab === "explainability" && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          {/* SHAP Feature Importance */}
           <div className="glass-panel p-6">
             <SectionHeader
               icon={<Brain className="w-5 h-5 text-[#8b5cf6]" />}
@@ -556,11 +545,11 @@ function ResultsContent() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart layout="vertical" data={shapFeatures.map(f => ({ feature: f.feature, score: parseFloat(f.importance.toFixed(4)), direction: f.direction }))}
                     margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f1f23" horizontal={false} />
-                    <XAxis type="number" stroke="#555" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis dataKey="feature" type="category" stroke="#555" fontSize={11} tickLine={false} axisLine={false} width={90} />
-                    <RechartsTooltip cursor={{ fill: "rgba(255,255,255,0.03)" }}
-                      contentStyle={{ backgroundColor: "#111113", borderColor: "#262626", borderRadius: "8px", color: "#fff", fontSize: "12px" }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={resolvedTheme === 'dark' ? "#1f1f23" : "#f1f5f9"} horizontal={false} />
+                    <XAxis type="number" stroke={resolvedTheme === 'dark' ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis dataKey="feature" type="category" stroke={resolvedTheme === 'dark' ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} width={90} />
+                    <RechartsTooltip cursor={{ fill: resolvedTheme === 'dark' ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}
+                      contentStyle={{ backgroundColor: resolvedTheme === 'dark' ? "#111113" : "#fff", borderColor: resolvedTheme === 'dark' ? "#262626" : "#e2e8f0", borderRadius: "8px", color: resolvedTheme === 'dark' ? "#fff" : "#0f172a", fontSize: "12px" }} />
                     <Bar dataKey="score" radius={[0, 4, 4, 0]} maxBarSize={28}>
                       {shapFeatures.map((f, i) => {
                         const isBiasedFeature = disparateImpacts.some((d) => d.status === "biased" && f.feature.toLowerCase().includes(d.name.toLowerCase()));
@@ -575,7 +564,6 @@ function ResultsContent() {
             )}
           </div>
 
-          {/* LIME Local Explanations */}
           {limeInstances.length > 0 && (
             <div className="glass-panel p-6">
               <SectionHeader
@@ -605,24 +593,23 @@ function ResultsContent() {
                 {mitigations.map((m, i) => <MitigationCard key={i} m={m} />)}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No specific mitigations needed — model appears balanced.</p>
+              <p className="text-sm text-slate-500 dark:text-gray-500">No specific mitigations needed — model appears balanced.</p>
             )}
           </div>
 
-          {/* Methodology Note */}
           <div className="glass-panel p-6 border-[#3b82f6]/20">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Mitigation Strategy Guide</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-500 dark:text-gray-400">
               <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
-                <p className="text-amber-400 font-semibold mb-2">Pre-processing</p>
+                <p className="text-amber-500 dark:text-amber-400 font-semibold mb-2">Pre-processing</p>
                 <p>Applied to training data before model training. Techniques: Reweighing, Disparate Impact Remover, Sampling strategies.</p>
               </div>
               <div className="bg-purple-500/5 border border-purple-500/20 rounded-lg p-4">
-                <p className="text-purple-400 font-semibold mb-2">Post-processing</p>
+                <p className="text-purple-500 dark:text-purple-400 font-semibold mb-2">Post-processing</p>
                 <p>Applied to model predictions after training. Techniques: Calibrated Equalized Odds, Reject Option Classification.</p>
               </div>
               <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-4">
-                <p className="text-blue-400 font-semibold mb-2">In-processing</p>
+                <p className="text-blue-500 dark:text-blue-400 font-semibold mb-2">In-processing</p>
                 <p>Constraints applied during model training. Techniques: Prejudice Remover, Adversarial Debiasing, Fairness constraints.</p>
               </div>
             </div>

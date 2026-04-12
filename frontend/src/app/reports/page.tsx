@@ -97,7 +97,7 @@ export default function ReportsPage() {
   const biasedCount = reports.length - fairCount;
 
   return (
-    <div className="flex-1 w-full max-w-6xl mx-auto px-6 py-8 flex flex-col pt-24 space-y-8">
+    <div className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col pt-20 sm:pt-24 space-y-6 sm:space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Audit Reports</h1>
@@ -123,30 +123,32 @@ export default function ReportsPage() {
       </motion.div>
 
       {/* Search + Refresh */}
-      <div className="flex gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 overflow-hidden">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-500" />
           <input
             type="text"
-            placeholder="Search by filename, target, or attribute…"
+            placeholder="Search audits..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-100 dark:bg-white/5 border border-[var(--panel-border)] rounded-lg pl-9 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#3b82f6] transition-colors"
           />
         </div>
-        <button
-          onClick={fetchReports}
-          className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-700 dark:text-white transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          <span className="hidden sm:inline">Refresh</span>
-        </button>
-        <button
-          onClick={() => router.push("/audit")}
-          className="flex items-center gap-2 bg-[#3b82f6] hover:bg-[#2563eb] px-4 py-2.5 rounded-lg text-sm text-white transition-colors font-medium"
-        >
-          + New Audit
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={fetchReports}
+            className="flex-1 sm:flex-auto flex items-center justify-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-[var(--panel-border)] px-4 py-2.5 rounded-lg text-sm text-slate-700 dark:text-white transition-colors"
+          >
+            <RefreshCw className={clsx("w-4 h-4", loading && "animate-spin")} />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={() => router.push("/audit")}
+            className="flex-1 sm:flex-auto flex items-center justify-center gap-2 bg-[#3b82f6] hover:bg-[#2563eb] px-4 py-2.5 rounded-lg text-sm text-white transition-colors font-medium whitespace-nowrap"
+          >
+            + <span className="hidden xs:inline">New Audit</span><span className="xs:hidden">New</span>
+          </button>
+        </div>
       </div>
 
       {/* Content */}
@@ -212,63 +214,75 @@ export default function ReportsPage() {
                     }
                   </div>
 
-                  {/* Main Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <h3 className="font-semibold text-slate-900 dark:text-white truncate">{report.filename}</h3>
-                      <span className={clsx(
-                        "text-[10px] px-2 py-0.5 rounded-full border font-medium shrink-0",
-                        isFair ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-red-500/15 text-red-400 border-red-500/30"
-                      )}>
-                        {isFair ? "Fair" : "Biased"} · {pct}%
-                      </span>
+                  {/* Content Header & Info */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <h3 className="font-semibold text-slate-900 dark:text-white truncate text-base">{report.filename}</h3>
+                          <span className={clsx(
+                            "text-[10px] px-2 py-0.5 rounded-full border font-medium shrink-0",
+                            isFair ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-red-500/15 text-red-400 border-red-500/30"
+                          )}>
+                            {isFair ? "Fair" : "Biased"} · {pct}%
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-gray-400">
+                          <span className="flex items-center gap-1">
+                            <Database className="w-3 h-3" />
+                            Target: <span className="text-slate-700 dark:text-gray-300 font-medium">{report.target_column}</span>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {date}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-gray-400">
-                      <span>Target: <span className="text-slate-700 dark:text-gray-300">{report.target_column}</span></span>
-                      <span>Sensitive: <span className="text-slate-700 dark:text-gray-300">{(report.sensitive_attributes || []).join(", ")}</span></span>
+
+                    {/* Score Bar - Responsive Width */}
+                    <div className="w-full sm:w-32 shrink-0">
+                      <div className="flex justify-between text-[10px] text-slate-500 dark:text-gray-500 mb-1">
+                        <span>Fairness Score</span><span>{pct}%</span>
+                      </div>
+                      <div className="h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          className="h-1.5 rounded-full transition-all"
+                          style={{
+                            backgroundColor: isFair ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ef4444"
+                          }}
+                        />
+                      </div>
                     </div>
-                      {/* Time removed as requested */}
                   </div>
 
-                  {/* Score Bar */}
-                  <div className="sm:w-28 shrink-0">
-                    <div className="flex justify-between text-[10px] text-slate-500 dark:text-gray-500 mb-1">
-                      <span>Score</span><span>{pct}%</span>
+                  {/* Actions - Bottom on mobile, Right on desktop */}
+                  <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDownload(report)}
+                        disabled={downloadingId === report.id}
+                        className="p-2.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                        title="Download PDF"
+                      >
+                        {downloadingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(report.id)}
+                        disabled={deletingId === report.id}
+                        className="p-2.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-red-500/10 dark:hover:bg-red-500/20 text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50"
+                        title="Delete Report"
+                      >
+                        {deletingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      </button>
                     </div>
-                    <div className="h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-1.5 rounded-full transition-all"
-                        style={{
-                          width: `${pct}%`,
-                          backgroundColor: isFair ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ef4444"
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleDownload(report)}
-                      disabled={downloadingId === report.id}
-                      className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50"
-                      title="Download PDF"
-                    >
-                      {downloadingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(report.id)}
-                      disabled={deletingId === report.id}
-                      className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-red-500/10 dark:hover:bg-red-500/20 text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50"
-                      title="Delete Report"
-                    >
-                      {deletingId === report.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                    </button>
                     <button
                       onClick={() => router.push(`/results?reportId=${report.id}`)}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 text-[#3b82f6] text-xs font-medium transition-colors"
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-1 px-4 py-2 rounded-lg bg-[#3b82f6] hover:bg-[#3b82f6]/90 text-white text-sm font-medium transition-colors"
                     >
-                      View <ChevronRight className="w-3 h-3" />
+                      View Report <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </motion.div>
