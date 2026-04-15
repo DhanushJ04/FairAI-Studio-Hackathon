@@ -63,6 +63,26 @@ async def get_report_stats(db: AsyncSession = Depends(get_db), current_user: Use
     }
 
 
+@router.get("/reports/global-stats")
+async def get_global_stats(db: AsyncSession = Depends(get_db)):
+    """Returns global summary statistics for all audit reports."""
+    result = await db.execute(
+        select(
+            func.count(AuditReport.id).label("total"),
+            func.sum(case((AuditReport.overall_fairness_score >= 0.7, 1), else_=0)).label("fair")
+        ).where(AuditReport.status == "completed")
+    )
+    stats = result.first()
+    total = stats.total or 0
+    fair = stats.fair or 0
+    return {
+        "total": total,
+        "fair": int(fair),
+        "biased": total - int(fair)
+    }
+
+
+
 @router.delete("/reports/{report_id}")
 async def delete_report(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Deletes an audit report by ID."""

@@ -15,7 +15,7 @@ interface Stats { total: number; fair: number; biased: number; }
 function useLiveStats(): Stats {
   const [stats, setStats] = useState<Stats>({ total: 0, fair: 0, biased: 0 });
   useEffect(() => {
-    api.get("/reports/stats").then((r) => {
+    api.get("/reports/global-stats").then((r) => {
       setStats(r.data);
     }).catch(() => {});
   }, []);
