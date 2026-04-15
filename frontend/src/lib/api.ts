@@ -22,12 +22,16 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response && error.response.status === 401) {
       if (typeof window !== 'undefined') {
-        import('next-auth/react').then(({ signOut }) => {
+        // Only sign out if the user actually has an active session
+        // This prevents infinite loops on public pages
+        const { getSession: checkSession, signOut } = await import('next-auth/react');
+        const session = await checkSession();
+        if (session?.apiToken) {
           signOut({ callbackUrl: '/' });
-        });
+        }
       }
     }
     return Promise.reject(error);

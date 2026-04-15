@@ -49,7 +49,11 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  pages: {
+    error: "/",  // Redirect auth errors to home page instead of default error page
+  },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-development-only",
+  debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);
