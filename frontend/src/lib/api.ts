@@ -20,4 +20,18 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== 'undefined') {
+        import('next-auth/react').then(({ signOut }) => {
+          signOut({ callbackUrl: '/' });
+        });
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
