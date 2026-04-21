@@ -152,7 +152,7 @@ function FairnessRadar({ metrics, isDark }: { metrics: Metric[]; isDark: boolean
 
   return (
     <div className="h-[280px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <RadarChart data={radarData} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
           <PolarGrid stroke={isDark ? "#262626" : "#e2e8f0"} />
           <PolarAngleAxis dataKey="metric" tick={{ fill: isDark ? "#9ca3af" : "#64748b", fontSize: 10 }} />
@@ -179,7 +179,7 @@ function GroupComparisonChart({ groupMetrics, isDark }: { groupMetrics: GroupMet
 
   return (
     <div className="h-[280px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1f1f23" : "#f1f5f9"} vertical={false} />
           <XAxis dataKey="name" stroke={isDark ? "#555" : "#64748b"} fontSize={10} tickLine={false} axisLine={false} angle={-30} textAnchor="end" interval={0} />
@@ -488,7 +488,7 @@ function ResultsContent() {
               />
               {disparateImpacts.length > 0 ? (
                 <div className="h-[220px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                     <BarChart data={disparateImpacts} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={resolvedTheme === 'dark' ? "#1f1f23" : "#f1f5f9"} vertical={false} />
                       <XAxis dataKey="name" stroke={resolvedTheme === 'dark' ? "#555" : "#64748b"} fontSize={11} tickLine={false} axisLine={false} />
@@ -542,7 +542,7 @@ function ResultsContent() {
             />
             {shapFeatures.length > 0 ? (
               <div className="h-[340px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <BarChart layout="vertical" data={shapFeatures.map(f => ({ feature: f.feature, score: parseFloat(f.importance.toFixed(4)), direction: f.direction }))}
                     margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={resolvedTheme === 'dark' ? "#1f1f23" : "#f1f5f9"} horizontal={false} />

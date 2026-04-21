@@ -2,12 +2,10 @@ import os
 import joblib
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from app.database import get_db
-from app.models import UploadedFile, AuditReport, User
+from app.models import create_audit_report_doc
 from app.deps import get_current_active_user
 from app.schemas import AnalysisRequest, AnalysisResponse
 from app.services.data_parser import load_data
@@ -18,14 +16,13 @@ from app.services.mitigator import generate_mitigation_strategies
 router = APIRouter()
 
 @router.post("/analyze-bias", response_model=AnalysisResponse)
-async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+async def analyze_bias(request: AnalysisRequest, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
     # 1. Fetch file info
-    result = await db.execute(select(UploadedFile).where(UploadedFile.id == request.file_id, UploadedFile.user_id == current_user.id))
-    file_record = result.scalars().first()
+    file_record = await db.uploaded_files.find_one({"_id": request.file_id, "user_id": current_user["_id"]})
     if not file_record:
         raise HTTPException(status_code=404, detail="File not found.")
         
-    filepath = file_record.filepath
+    filepath = file_record["filepath"]
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Physical file missing.")
 
@@ -68,11 +65,10 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
     # 3. Model Handling
     model = None
     if request.model_file_id:
-        m_res = await db.execute(select(UploadedFile).where(UploadedFile.id == request.model_file_id, UploadedFile.user_id == current_user.id))
-        m_record = m_res.scalars().first()
-        if m_record and os.path.exists(m_record.filepath):
+        m_record = await db.uploaded_files.find_one({"_id": request.model_file_id, "user_id": current_user["_id"]})
+        if m_record and os.path.exists(m_record["filepath"]):
             try:
-                model = joblib.load(m_record.filepath)
+                model = joblib.load(m_record["filepath"])
             except Exception as e:
                 raise HTTPException(status_code=400, detail=f"Could not load model: {str(e)}")
     
@@ -94,11 +90,11 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
     # 7. Mitigation Strategies
     mitigations = generate_mitigation_strategies(bias_results["metrics"])
     
-    # 8. Save Report to DB
-    report = AuditReport(
-        user_id=current_user.id,
+    # 8. Save Report to MongoDB
+    report = create_audit_report_doc(
+        user_id=current_user["_id"],
         file_id=request.file_id,
-        filename=file_record.filename,
+        filename=file_record["filename"],
         target_column=request.target_column,
         sensitive_attributes=request.sensitive_attributes,
         favorable_label=str(request.favorable_label),
@@ -110,16 +106,14 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
         shap_summary_json=shap_features,
         lime_summary_json=lime_explanations,
         mitigation_json=mitigations,
-        status="completed"
+        status="completed",
     )
-    
-    db.add(report)
-    await db.commit()
-    await db.refresh(report)
+
+    await db.audit_reports.insert_one(report)
     
     return {
-        "report_id": report.id,
-        "filename": file_record.filename,
+        "report_id": report["_id"],
+        "filename": file_record["filename"],
         "target_column": request.target_column,
         "sensitive_attributes": request.sensitive_attributes,
         "overall_fairness_score": bias_results["overall_fairness_score"],
@@ -128,38 +122,38 @@ async def analyze_bias(request: AnalysisRequest, db: AsyncSession = Depends(get_
         "shap_features": shap_features,
         "lime_explanations": lime_explanations,
         "mitigation_strategies": mitigations,
-        "created_at": report.created_at
+        "created_at": report["created_at"]
     }
 
 @router.get("/metrics/{report_id}")
-async def get_metrics(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
-    report = result.scalars().first()
-    if not report: raise HTTPException(404, "Report not found")
-    return {"metrics": report.metrics_json, "group_metrics": report.group_metrics_json}
+async def get_metrics(report_id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
+    report = await db.audit_reports.find_one({"_id": report_id, "user_id": current_user["_id"]})
+    if not report:
+        raise HTTPException(404, "Report not found")
+    return {"metrics": report.get("metrics_json"), "group_metrics": report.get("group_metrics_json")}
 
 @router.get("/summary/{report_id}")
-async def get_summary(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
-    report = result.scalars().first()
-    if not report: raise HTTPException(404, "Report not found")
+async def get_summary(report_id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
+    report = await db.audit_reports.find_one({"_id": report_id, "user_id": current_user["_id"]})
+    if not report:
+        raise HTTPException(404, "Report not found")
     return {
-        "report_id": report.id,
-        "filename": report.filename,
-        "target_column": report.target_column,
-        "sensitive_attributes": report.sensitive_attributes,
-        "overall_score": report.overall_fairness_score,
-        "metrics": report.metrics_json,
-        "group_metrics": report.group_metrics_json,
-        "shap": report.shap_summary_json,
-        "lime": report.lime_summary_json,
-        "mitigations": report.mitigation_json,
-        "created_at": report.created_at.isoformat() if report.created_at else None,
+        "report_id": report["_id"],
+        "filename": report["filename"],
+        "target_column": report["target_column"],
+        "sensitive_attributes": report["sensitive_attributes"],
+        "overall_score": report.get("overall_fairness_score"),
+        "metrics": report.get("metrics_json"),
+        "group_metrics": report.get("group_metrics_json"),
+        "shap": report.get("shap_summary_json"),
+        "lime": report.get("lime_summary_json"),
+        "mitigations": report.get("mitigation_json"),
+        "created_at": report["created_at"].isoformat() if report.get("created_at") else None,
     }
 
 @router.get("/mitigation/{report_id}")
-async def get_mitigation(report_id: str, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    result = await db.execute(select(AuditReport).where(AuditReport.id == report_id, AuditReport.user_id == current_user.id))
-    report = result.scalars().first()
-    if not report: raise HTTPException(404, "Report not found")
-    return {"mitigations": report.mitigation_json}
+async def get_mitigation(report_id: str, db=Depends(get_db), current_user: dict = Depends(get_current_active_user)):
+    report = await db.audit_reports.find_one({"_id": report_id, "user_id": current_user["_id"]})
+    if not report:
+        raise HTTPException(404, "Report not found")
+    return {"mitigations": report.get("mitigation_json")}

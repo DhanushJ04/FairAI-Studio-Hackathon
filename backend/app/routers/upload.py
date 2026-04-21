@@ -2,10 +2,9 @@ import os
 import shutil
 import uuid
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.config import UPLOAD_DIR
-from app.models import UploadedFile, User
+from app.models import create_uploaded_file_doc
 from app.deps import get_current_active_user
 from app.schemas import UploadResponse
 from app.services.data_parser import process_data_file
@@ -15,8 +14,8 @@ router = APIRouter()
 @router.post("/upload", response_model=UploadResponse)
 async def upload_file(
     file: UploadFile = File(...), 
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    db=Depends(get_db),
+    current_user: dict = Depends(get_current_active_user)
 ):
     if not file.filename.endswith(".csv") and not file.filename.endswith(".xlsx") and not file.filename.endswith((".pkl", ".joblib")):
         raise HTTPException(status_code=400, detail="Only CSV, Excel (.xlsx), or model files are supported.")
@@ -46,20 +45,18 @@ async def upload_file(
             os.remove(filepath)
             raise HTTPException(status_code=400, detail=f"Failed to process dataset: {str(e)}")
             
-    # Save to db
-    db_file = UploadedFile(
-        id=file_id,
-        user_id=current_user.id,
+    # Save to MongoDB
+    doc = create_uploaded_file_doc(
+        file_id=file_id,
+        user_id=current_user["_id"],
         filename=file.filename,
         filepath=filepath,
         file_type=file_type,
         columns=columns_data,
         row_count=row_count,
-        file_size=os.path.getsize(filepath)
+        file_size=os.path.getsize(filepath),
     )
-    
-    db.add(db_file)
-    await db.commit()
+    await db.uploaded_files.insert_one(doc)
     
     return {
         "file_id": file_id,

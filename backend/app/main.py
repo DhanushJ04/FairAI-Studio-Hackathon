@@ -2,7 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import init_db
+from app.database import init_db, close_db
 from app.routers import upload, analysis, reports, auth
 
 logging.basicConfig(level=logging.INFO)
@@ -12,12 +12,13 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Initializing database...")
+    logger.info("Initializing MongoDB...")
     await init_db()
     
     logger.info("Application started gracefully.")
     yield
     # Shutdown
+    await close_db()
     logger.info("Application shutting down.")
 
 

@@ -28,10 +28,10 @@ export default function Footer() {
             <h4 className="text-slate-900 dark:text-white font-semibold mb-6 text-sm">Contact with us:</h4>
             <div className="space-y-6">
               <div>
-                <p className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <div className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Business Inquiry:
-                </p>
+                </div>
                 <a href="mailto:fairaistudio@gmail.com" className="flex items-center gap-3 text-slate-600 dark:text-gray-300 hover:text-[#3b82f6] transition-colors group">
                   <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
                     <Mail className="w-4 h-4" />
@@ -40,10 +40,10 @@ export default function Footer() {
                 </a>
               </div>
               <div>
-                <p className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <div className="text-slate-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-[#3b82f6]" />
                   For Support & Queries:
-                </p>
+                </div>
                 <a href="mailto:fairaistudio.support@gmail.com" className="flex items-center gap-3 text-slate-600 dark:text-gray-300 hover:text-[#3b82f6] transition-colors group">
                   <div className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-[#3b82f6]/30 group-hover:bg-[#3b82f6]/5 transition-all text-[#3b82f6]">
                     <Mail className="w-4 h-4" />
