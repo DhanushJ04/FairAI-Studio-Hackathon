@@ -22,5 +22,5 @@ urllib3==2.2.2
 charset-normalizer==3.3.2
 chardet==5.2.0
 motor==3.6.0
-pymongo==4.10.1
+pymongo==4.9.2
 certifi
