@@ -5,7 +5,7 @@ Instead of SQLAlchemy ORM models, we use plain dicts for MongoDB documents.
 These helper functions create properly structured documents with defaults.
 """
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def generate_uuid():
@@ -30,7 +30,7 @@ def create_user_doc(
         "auth_provider": auth_provider,
         "provider_id": provider_id,
         "full_name": full_name,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "is_active": 1,
     }
 
@@ -54,7 +54,7 @@ def create_uploaded_file_doc(
         "columns": columns,
         "row_count": row_count,
         "file_size": file_size,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
     }
 
 
@@ -102,6 +102,6 @@ def create_audit_report_doc(
         "mitigation_json": mitigation_json,
         "feature_importance_json": feature_importance_json,
         "status": status,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "completed_at": None,
     }

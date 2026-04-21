@@ -191,7 +191,7 @@ export default function ReportsPage() {
               const pct = Math.round(score * 100);
               const isFair = pct >= 70;
               const date = report.created_at
-                ? new Date(report.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+                ? new Date(report.created_at + (report.created_at.endsWith("Z") ? "" : "Z")).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
                 : "Unknown";
 
               return (
