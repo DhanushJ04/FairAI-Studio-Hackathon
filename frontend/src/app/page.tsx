@@ -8,17 +8,26 @@ import {
   TrendingUp, CheckCircle, AlertTriangle, Zap,
 } from "lucide-react";
 import api from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 /* ── Live stats from backend ─────────────────────────────────── */
 interface Stats { total: number; fair: number; biased: number; }
 
 function useLiveStats(): Stats {
+  const { status } = useSession();
   const [stats, setStats] = useState<Stats>({ total: 0, fair: 0, biased: 0 });
+  
   useEffect(() => {
-    api.get("/reports/global-stats").then((r) => {
-      setStats(r.data);
-    }).catch(() => {});
-  }, []);
+    if (status === "authenticated") {
+      api.get("/reports/stats").then((r) => {
+        setStats(r.data);
+      }).catch(() => {});
+    } else if (status === "unauthenticated") {
+      api.get("/reports/global-stats").then((r) => {
+        setStats(r.data);
+      }).catch(() => {});
+    }
+  }, [status]);
   return stats;
 }
 
@@ -152,30 +161,28 @@ export default function Home() {
       </section>
 
       {/* ── LIVE STATS STRIP ── */}
-      {stats.total > 0 && (
-        <motion.section
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          className="w-full max-w-6xl mx-auto px-6 mb-16"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { label: "Audits Run", val: stats.total, icon: <TrendingUp className="w-5 h-5 text-[#3b82f6]" />, color: "text-[#3b82f6]" },
-              { label: "Fair Results", val: stats.fair, icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, color: "text-emerald-400" },
-              { label: "Bias Flagged", val: stats.biased, icon: <AlertTriangle className="w-5 h-5 text-red-400" />, color: "text-red-400" },
-            ].map((s, i) => (
-              <div key={i} className="glass-panel p-5 flex items-center gap-4">
-                <div className="p-2 bg-white/5 rounded-xl">{s.icon}</div>
-                <div>
-                  <p className={`text-3xl font-bold ${s.color}`}>
-                    <Counter to={s.val} />
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{s.label}</p>
-                </div>
+      <motion.section
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+        className="w-full max-w-6xl mx-auto px-6 mb-16"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { label: "Audits Run", val: stats.total, icon: <TrendingUp className="w-5 h-5 text-[#3b82f6]" />, color: "text-[#3b82f6]" },
+            { label: "Fair Results", val: stats.fair, icon: <CheckCircle className="w-5 h-5 text-emerald-400" />, color: "text-emerald-400" },
+            { label: "Bias Flagged", val: stats.biased, icon: <AlertTriangle className="w-5 h-5 text-red-400" />, color: "text-red-400" },
+          ].map((s, i) => (
+            <div key={i} className="glass-panel p-5 flex items-center gap-4">
+              <div className="p-2 bg-white/5 rounded-xl">{s.icon}</div>
+              <div>
+                <p className={`text-3xl font-bold ${s.color}`}>
+                  <Counter to={s.val} />
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{s.label}</p>
               </div>
-            ))}
-          </div>
-        </motion.section>
-      )}
+            </div>
+          ))}
+        </div>
+      </motion.section>
 
       {/* ── FEATURES ── */}
       <section className="w-full max-w-6xl mx-auto px-6 mb-20">
